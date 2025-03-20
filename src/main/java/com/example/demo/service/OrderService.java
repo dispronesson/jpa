@@ -17,6 +17,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
 
+    private static final String INVALID_ID_MESSAGE = "Invalid order id";
+    private static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
+
     @Transactional
     public Order createOrder(Long id, Order order) {
         if (id <= 0) {
@@ -36,11 +39,11 @@ public class OrderService {
     @Transactional
     public Order updateEntireOrder(Long id, Order newOrder) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid order id");
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
 
         existingOrder.getUser().setOrders(null);
 
@@ -58,11 +61,11 @@ public class OrderService {
     @Transactional
     public Order updatePartiallyOrder(Long id, Order newOrder) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid order id");
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
 
         existingOrder.getUser().setOrders(null);
 
@@ -80,13 +83,13 @@ public class OrderService {
     @Transactional
     public void deleteOrder(Long id) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid order id");
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         if (orderRepository.existsById(id)) {
             orderRepository.deleteById(id);
         } else {
-            throw new ResourceNotFoundException("Order not found");
+            throw new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE);
         }
     }
 
@@ -98,11 +101,11 @@ public class OrderService {
 
     public Order getOrderById(Long id) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid order id");
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
         order.getUser().setOrders(null);
 
         return order;

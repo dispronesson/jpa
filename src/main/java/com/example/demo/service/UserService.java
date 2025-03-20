@@ -20,7 +20,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private static final String InvalidId = "Invalid user id";
+    private static final String INVALID_ID_MESSAGE = "Invalid user id";
+    private static final String USER_NOT_FOUND_MESSAGE = "User not found";
 
     @Transactional
     public User createUser(User user) {
@@ -36,11 +37,11 @@ public class UserService {
     @Transactional
     public User updateEntireUser(Long id, User newUser) {
         if (id <= 0) {
-            throw new InvalidArgumentsException(InvalidId);
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
 
         if (newUser.getEmail() == null || newUser.getName() == null
             || newUser.getEmail().isBlank() || newUser.getName().isBlank()) {
@@ -62,11 +63,11 @@ public class UserService {
     @Transactional
     public User updatePartiallyUser(Long id, User newUser) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid user id");
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
 
         if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
             existingUser.setEmail(newUser.getEmail());
@@ -87,13 +88,13 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         if (id <= 0) {
-            throw new InvalidArgumentsException(InvalidId);
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {
-            throw new ResourceNotFoundException("User not found");
+            throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE);
         }
     }
 
@@ -105,11 +106,11 @@ public class UserService {
 
     public User getUserById(Long id) {
         if (id <= 0) {
-            throw new InvalidArgumentsException(InvalidId);
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
         user.getOrders().forEach(order -> order.setUser(null));
         
         return user;
