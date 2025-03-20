@@ -20,6 +20,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private static final String InvalidId = "Invalid user id";
+
     @Transactional
     public User createUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
@@ -34,7 +36,7 @@ public class UserService {
     @Transactional
     public User updateEntireUser(Long id, User newUser) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid user id");
+            throw new InvalidArgumentsException(InvalidId);
         }
 
         User existingUser = userRepository.findById(id)
@@ -85,7 +87,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid user id");
+            throw new InvalidArgumentsException(InvalidId);
         }
 
         if (userRepository.existsById(id)) {
@@ -103,7 +105,7 @@ public class UserService {
 
     public User getUserById(Long id) {
         if (id <= 0) {
-            throw new InvalidArgumentsException("Invalid user id");
+            throw new InvalidArgumentsException(InvalidId);
         }
 
         User user = userRepository.findById(id)
