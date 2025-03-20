@@ -5,9 +5,9 @@ import com.example.demo.exceptions.InvalidArgumentsException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private final UserRepository userRepository;
 
     @Transactional
@@ -38,13 +41,16 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (newUser.getEmail() == null || newUser.getName() == null
-            || newUser.getEmail().isBlank() && newUser.getName().isBlank()) {
+            || newUser.getEmail().isBlank() || newUser.getName().isBlank()) {
             throw new InvalidArgumentsException("Email or name is required");
         }
 
         existingUser.setEmail(newUser.getEmail());
         existingUser.setName(newUser.getName());
+
         userRepository.save(existingUser);
+        entityManager.flush();
+        entityManager.detach(existingUser);
 
         existingUser.getOrders().forEach(order -> order.setUser(null));
 
@@ -69,7 +75,8 @@ public class UserService {
         }
 
         userRepository.save(existingUser);
-
+        entityManager.flush();
+        entityManager.detach(existingUser);
         existingUser.getOrders().forEach(order -> order.setUser(null));
 
         return existingUser;
