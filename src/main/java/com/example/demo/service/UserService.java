@@ -5,8 +5,6 @@ import com.example.demo.exceptions.InvalidArgumentsException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
-//import jakarta.persistence.EntityManager;
-//import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    //@PersistenceContext
-    //private EntityManager entityManager;
-
     private final UserRepository userRepository;
 
     private static final String INVALID_ID_MESSAGE = "Invalid user id";
@@ -51,13 +46,7 @@ public class UserService {
         existingUser.setEmail(newUser.getEmail());
         existingUser.setName(newUser.getName());
 
-        /*userRepository.save(existingUser);
-        entityManager.flush();
-        entityManager.detach(existingUser);
-
-        existingUser.getOrders().forEach(order -> order.setUser(null));*/
-
-        return userRepository.save(existingUser); //existingUser;
+        return userRepository.save(existingUser);
     }
 
     @Transactional
@@ -77,12 +66,7 @@ public class UserService {
             existingUser.setName(newUser.getName());
         }
 
-        /*userRepository.save(existingUser);
-        entityManager.flush();
-        entityManager.detach(existingUser);
-        existingUser.getOrders().forEach(order -> order.setUser(null));*/
-
-        return userRepository.save(existingUser); //existingUser;
+        return userRepository.save(existingUser);
     }
 
     @Transactional
@@ -108,19 +92,13 @@ public class UserService {
         if (id <= 0) {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
-
-        /*User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
-        user.getOrders().forEach(order -> order.setUser(null));*/
         
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE)); //user;
     }
 
     public List<User> getUsersWithOrders() {
-        //List<User> users = userRepository.findByOrdersIsNotEmpty();
-        //users.forEach(user -> user.getOrders().forEach(order -> order.setUser(null)));
-        return userRepository.findByOrdersIsNotEmpty(); //users;
+        return userRepository.findByOrdersIsNotEmpty();
     }
 
     public List<User> getUsersWithoutOrders() {
