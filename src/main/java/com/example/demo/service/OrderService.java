@@ -29,7 +29,7 @@ public class OrderService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        user.setOrders(null);
+        //user.setOrders(null);
         order.setId(null);
         order.setUser(user);
 
@@ -45,7 +45,7 @@ public class OrderService {
         Order existingOrder = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
 
-        existingOrder.getUser().setOrders(null);
+        //existingOrder.getUser().setOrders(null);
 
         if (newOrder.getDescription() == null || newOrder.getPrice() == null
             || newOrder.getDescription().isBlank() || (newOrder.getPrice() <= 0)) {
@@ -67,7 +67,7 @@ public class OrderService {
         Order existingOrder = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
 
-        existingOrder.getUser().setOrders(null);
+        //existingOrder.getUser().setOrders(null);
 
         if (newOrder.getDescription() != null && !newOrder.getDescription().isBlank()) {
             existingOrder.setDescription(newOrder.getDescription());
@@ -94,9 +94,9 @@ public class OrderService {
     }
 
     public List<Order> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();
-        orders.forEach(order -> order.getUser().setOrders(null));
-        return orders;
+        //List<Order> orders = orderRepository.findAll();
+        //orders.forEach(order -> order.getUser().setOrders(null));
+        return orderRepository.findAll(); //orders;
     }
 
     public Order getOrderById(Long id) {
@@ -104,10 +104,11 @@ public class OrderService {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
-        Order order = orderRepository.findById(id)
+        /*Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
-        order.getUser().setOrders(null);
+        order.getUser().setOrders(null);*/
 
-        return order;
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE)); //order;
     }
 }

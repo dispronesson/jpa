@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
