@@ -94,7 +94,7 @@ public class UserService {
         }
         
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE)); //user;
+                .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE));
     }
 
     public List<User> getUsersWithOrders() {
