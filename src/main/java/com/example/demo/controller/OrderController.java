@@ -6,14 +6,7 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +44,21 @@ public class OrderController {
     @GetMapping("/orders/{id}")
     public Order getOrder(@PathVariable long id) {
         return orderService.getOrderById(id);
+    }
+
+    @GetMapping("/orders")
+    public List<Order> getOrdersByPriceGreaterOrEqual(@RequestParam double minPrice) {
+        return orderService.getOrdersByPriceGreaterOrEqual(minPrice);
+    }
+
+    @GetMapping("/orders")
+    List<Order> getOrdersByPriceLessOrEqual(@RequestParam double minPrice) {
+        return orderService.getOrdersByPriceLessOrEqual(minPrice);
+    }
+
+    @GetMapping("/orders")
+    List<Order> getOrdersByPriceBetween(@RequestParam Double minPrice,
+                                        @RequestParam Double maxPrice) {
+        return orderService.getOrdersByPriceBetween(minPrice, maxPrice);
     }
 }

@@ -19,6 +19,7 @@ public class OrderService {
 
     private static final String INVALID_ID_MESSAGE = "Invalid order id";
     private static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
+    private static final String INVALID_PRICE_MESSAGE = "Invalid order price";
 
     @Transactional
     public Order createOrder(Long id, Order order) {
@@ -99,5 +100,29 @@ public class OrderService {
 
         return orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
+    }
+
+    public List<Order> getOrdersByPriceGreaterOrEqual(Double minPrice) {
+        if (minPrice <= 0) {
+            throw new InvalidArgumentsException(INVALID_PRICE_MESSAGE);
+        }
+
+        return orderRepository.findByPriceGreaterOrEqual(minPrice);
+    }
+
+    public List<Order> getOrdersByPriceLessOrEqual(Double maxPrice) {
+        if (maxPrice <= 0) {
+            throw new InvalidArgumentsException(INVALID_PRICE_MESSAGE);
+        }
+
+        return orderRepository.findByPriceLessOrEqual(maxPrice);
+    }
+
+    public List<Order> getOrdersByPriceBetween(Double minPrice, Double maxPrice) {
+        if (minPrice <= 0 || maxPrice <= 0 || minPrice >= maxPrice) {
+            throw new InvalidArgumentsException(INVALID_PRICE_MESSAGE);
+        }
+
+        return orderRepository.findByPriceBetween(minPrice, maxPrice);
     }
 }
