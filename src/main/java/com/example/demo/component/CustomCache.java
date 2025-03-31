@@ -2,6 +2,7 @@ package com.example.demo.component;
 
 import com.example.demo.model.Order;
 import com.example.demo.model.User;
+import com.example.demo.util.Cache;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.example.demo.component;
+package com.example.demo.util;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
