@@ -6,7 +6,15 @@ import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,8 +45,11 @@ public class OrderController {
     }
 
     @GetMapping("/orders")
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public List<Order> getOrdersPageable(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return orderService.getOrdersPageable(page, size).getContent();
     }
 
     @GetMapping("/orders/{id}")
@@ -46,19 +57,20 @@ public class OrderController {
         return orderService.getOrderById(id);
     }
 
-    @GetMapping("/orders")
-    public List<Order> getOrdersByPriceGreaterOrEqual(@RequestParam double minPrice) {
-        return orderService.getOrdersByPriceGreaterOrEqual(minPrice);
+    @GetMapping("/orders/price")
+    public List<Order> getOrdersByPrice(
+            @RequestParam(defaultValue = "0") double minPrice,
+            @RequestParam(defaultValue = "0") double maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return orderService.getOrdersByPrice(minPrice, maxPrice, page, size).getContent();
     }
 
-    @GetMapping("/orders")
-    List<Order> getOrdersByPriceLessOrEqual(@RequestParam double minPrice) {
-        return orderService.getOrdersByPriceLessOrEqual(minPrice);
-    }
-
-    @GetMapping("/orders")
-    List<Order> getOrdersByPriceBetween(@RequestParam Double minPrice,
-                                        @RequestParam Double maxPrice) {
-        return orderService.getOrdersByPriceBetween(minPrice, maxPrice);
+    @GetMapping(value = "/orders", params = "userId")
+    List<Order> getOrdersByUserId(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return orderService.getOrdersByUserId(userId, page, size).getContent();
     }
 }

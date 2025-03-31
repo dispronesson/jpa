@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,8 +47,11 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getUsers() {
-        return userService.getAllUsers();
+    public List<User> getUsersPageable(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return userService.getUsersPageable(page, size).getContent();
     }
 
     @GetMapping("/with-orders")
@@ -55,7 +59,7 @@ public class UserController {
         return userService.getUsersWithOrders();
     }
 
-    @GetMapping("without-orders")
+    @GetMapping("/without-orders")
     public List<User> getUsersWithoutOrders() {
         return userService.getUsersWithoutOrders();
     }
