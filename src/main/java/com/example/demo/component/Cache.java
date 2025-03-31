@@ -2,7 +2,6 @@ package com.example.demo.component;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
 public class Cache<K, V> extends LinkedHashMap<K, V> {
     private static final int CAPACITY = 4;
