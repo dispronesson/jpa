@@ -1,7 +1,7 @@
 package com.example.demo.component;
 
-import com.example.demo.model.Order;
-import com.example.demo.model.User;
+import com.example.demo.dto.OrderResponseDto;
+import com.example.demo.dto.UserResponseDto;
 import com.example.demo.util.Cache;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +11,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class CustomCache {
-    private final Cache<Long, User> userCache = new Cache<>();
-    private final Cache<Long, Order> orderCache = new Cache<>();
+    private final Cache<Long, UserResponseDto> userCache = new Cache<>();
+    private final Cache<Long, OrderResponseDto> orderCache = new Cache<>();
 }

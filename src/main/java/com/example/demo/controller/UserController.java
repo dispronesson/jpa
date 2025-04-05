@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.UserRequestDto;
+import com.example.demo.dto.UserResponseDto;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +27,21 @@ public class UserController {
     public final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
+    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto user) {
+        UserResponseDto createdUser = userService.createUser(user);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId()))
                 .body(createdUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable long id, @RequestBody User user) {
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable long id,
+                                                      @Valid @RequestBody UserRequestDto user) {
         return ResponseEntity.ok(userService.updateEntireUser(id, user));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<User> patchUser(@PathVariable long id, @RequestBody User user) {
+    public ResponseEntity<UserResponseDto> patchUser(@PathVariable long id,
+                                                     @RequestBody UserRequestDto user) {
         return ResponseEntity.ok(userService.updatePartiallyUser(id, user));
     }
 
@@ -47,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getUsersPageable(
+    public List<UserResponseDto> getUsersPageable(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -55,17 +60,17 @@ public class UserController {
     }
 
     @GetMapping("/with-orders")
-    public List<User> getUsersWithOrders() {
+    public List<UserResponseDto> getUsersWithOrders() {
         return userService.getUsersWithOrders();
     }
 
     @GetMapping("/without-orders")
-    public List<User> getUsersWithoutOrders() {
+    public List<UserResponseDto> getUsersWithoutOrders() {
         return userService.getUsersWithoutOrders();
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable long id) {
+    public UserResponseDto getUser(@PathVariable long id) {
         return userService.getUserById(id);
     }
 }

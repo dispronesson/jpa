@@ -1,16 +1,20 @@
 package com.example.demo.service;
 
 import com.example.demo.component.CustomCache;
-import com.example.demo.exceptions.InvalidArgumentsException;
-import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.dto.OrderRequestDto;
+import com.example.demo.dto.OrderResponseDto;
+import com.example.demo.exception.InvalidArgumentsException;
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.Order;
 import com.example.demo.model.User;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -24,37 +28,35 @@ public class OrderService {
     private final CustomCache cache;
 
     private static final String INVALID_ID_MESSAGE = "Invalid order id";
-    private static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
-    private static final String INVALID_PRICE_MESSAGE = "Invalid order price";
 
     @Transactional
-    public Order createOrder(Long id, Order order) {
+    public OrderResponseDto createOrder(Long id, OrderRequestDto order) {
         if (id <= 0) {
             throw new InvalidArgumentsException("Invalid user id");
         }
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
 
-        order.setId(null);
-        order.setUser(user);
+        Order newOrder = new Order();
+        newOrder.setDescription(order.getDescription());
+        newOrder.setPrice(order.getPrice());
+        newOrder.setUser(user);
 
-        return orderRepository.save(order);
+        orderRepository.save(newOrder);
+        cache.getUserCache().remove(id);
+
+        return new OrderResponseDto(newOrder);
     }
 
     @Transactional
-    public Order updateEntireOrder(Long id, Order newOrder) {
+    public OrderResponseDto updateEntireOrder(Long id, OrderRequestDto newOrder) {
         if (id <= 0) {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
-
-        if (newOrder.getDescription() == null || newOrder.getPrice() == null
-            || newOrder.getDescription().isBlank() || (newOrder.getPrice() <= 0)) {
-            throw new InvalidArgumentsException("Invalid order description or order price");
-        }
+                .orElseThrow(() -> new NotFoundException("Order with id " + id + " not found"));
 
         existingOrder.setDescription(newOrder.getDescription());
         existingOrder.setPrice(newOrder.getPrice());
@@ -63,23 +65,35 @@ public class OrderService {
         cache.getOrderCache().remove(id);
         cache.getUserCache().remove(existingOrder.getUser().getId());
 
-        return existingOrder;
+        return new OrderResponseDto(existingOrder);
     }
 
     @Transactional
-    public Order updatePartiallyOrder(Long id, Order newOrder) {
+    public OrderResponseDto updatePartiallyOrder(Long id, OrderRequestDto newOrder) {
         if (id <= 0) {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
         Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new NotFoundException("Order with id " + id + " not found"));
 
-        if (newOrder.getDescription() != null && !newOrder.getDescription().isBlank()) {
+        if ((newOrder.getDescription() == null || newOrder.getDescription().isBlank())
+            && (newOrder.getPrice() == null || newOrder.getPrice() <= 0)) {
+            throw new InvalidArgumentsException("Description and price cannot be null"
+                                                + " or blank at the same time");
+        }
+
+        if (newOrder.getDescription() != null) {
+            if (newOrder.getDescription().isBlank()) {
+                throw new InvalidArgumentsException("Description cannot be blank");
+            }
             existingOrder.setDescription(newOrder.getDescription());
         }
 
-        if (newOrder.getPrice() != null && newOrder.getPrice() > 0) {
+        if (newOrder.getPrice() != null) {
+            if (newOrder.getPrice() <= 0) {
+                throw new InvalidArgumentsException("Price must be greater than 0");
+            }
             existingOrder.setPrice(newOrder.getPrice());
         }
 
@@ -88,7 +102,7 @@ public class OrderService {
         cache.getOrderCache().remove(id);
         cache.getUserCache().remove(existingOrder.getUser().getId());
 
-        return existingOrder;
+        return new OrderResponseDto(existingOrder);
     }
 
     @Transactional
@@ -103,16 +117,27 @@ public class OrderService {
             cache.getOrderCache().remove(id);
             order.ifPresent(value -> cache.getUserCache().remove(value.getUser().getId()));
         } else {
-            throw new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE);
+            throw new NotFoundException("Order with id " + id + " not found");
         }
     }
 
-    public Page<Order> getOrdersPageable(int page, int size) {
+    public Page<OrderResponseDto> getOrdersPageable(int page, int size) {
+        if (page < 0) {
+            throw new InvalidArgumentsException("Page number cannot be negative");
+        } else if (size <= 0) {
+            throw new InvalidArgumentsException("Page size cannot be negative or zero");
+        }
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        return orderRepository.findOrdersPageable(pageable);
+        Page<Order> ordersPage = orderRepository.findOrdersPageable(pageable);
+
+        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                .map(OrderResponseDto::new).toList();
+
+        return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
 
-    public Order getOrderById(Long id) {
+    public OrderResponseDto getOrderById(Long id) {
         if (id <= 0) {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
@@ -122,42 +147,67 @@ public class OrderService {
         }
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ORDER_NOT_FOUND_MESSAGE));
-        cache.getOrderCache().put(id, order);
+                .orElseThrow(() -> new NotFoundException("Order with id " + id + " not found"));
+        OrderResponseDto orderDto = new OrderResponseDto(order);
 
-        return order;
+        cache.getOrderCache().put(id, orderDto);
+
+        return orderDto;
     }
 
-    public Page<Order> getOrdersByPrice(Double minPrice, Double maxPrice, int page, int size) {
+    public Page<OrderResponseDto> getOrdersByPrice(Double minPrice, Double maxPrice,
+                                                   int page, int size) {
+        if (page < 0) {
+            throw new InvalidArgumentsException("Page number cannot be negative");
+        } else if (size <= 0) {
+            throw new InvalidArgumentsException("Page size cannot be negative or zero");
+        }
+
         if (minPrice < 0 || maxPrice < 0 || (minPrice > maxPrice && maxPrice != 0)
             || (minPrice == 0 && maxPrice == 0)) {
-            throw new InvalidArgumentsException(INVALID_PRICE_MESSAGE);
+            throw new InvalidArgumentsException("Invalid price range");
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 
         if (maxPrice == 0) {
-            return orderRepository.findByPriceGreaterOrEqual(pageable, minPrice);
+            Page<Order> ordersPage = orderRepository.findByPriceGreaterOrEqual(pageable, minPrice);
+            List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                    .map(OrderResponseDto::new).toList();
+            return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
         } else if (minPrice == 0) {
-            return orderRepository.findByPriceLessOrEqual(pageable, maxPrice);
+            Page<Order> ordersPage = orderRepository.findByPriceLessOrEqual(pageable, maxPrice);
+            List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                    .map(OrderResponseDto::new).toList();
+            return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
         } else {
-            return orderRepository.findByPriceBetween(pageable, minPrice, maxPrice);
+            Page<Order> ordersPage = orderRepository
+                    .findByPriceBetween(pageable, minPrice, maxPrice);
+            List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                    .map(OrderResponseDto::new).toList();
+            return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
         }
     }
 
-    public Page<Order> getOrdersByUserId(Long userId, int page, int size) {
+    public Page<OrderResponseDto> getOrdersByUserId(Long userId, int page, int size) {
         if (userId <= 0) {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
-        Optional<User> user = userRepository.findById(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
-        if (user.isEmpty()) {
-            throw new ResourceNotFoundException("User not found");
+        if (page < 0) {
+            throw new InvalidArgumentsException("Page number cannot be negative");
+        } else if (size <= 0) {
+            throw new InvalidArgumentsException("Page size cannot be negative or zero");
         }
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Order> ordersPage = orderRepository.findByUserId(userId, pageable);
+        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                .map(OrderResponseDto::new).toList();
 
-        return orderRepository.findByUserId(userId, pageable);
+        return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
 }

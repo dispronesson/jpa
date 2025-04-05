@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Order;
+import com.example.demo.dto.OrderRequestDto;
+import com.example.demo.dto.OrderResponseDto;
 import com.example.demo.service.OrderService;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,30 +24,33 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/users/{id}/order")
-    public ResponseEntity<Order> createOrder(@PathVariable long id, @RequestBody Order order) {
-        Order createdOrder = orderService.createOrder(id, order);
+    public ResponseEntity<OrderResponseDto> createOrder(@PathVariable long id,
+                                                        @Valid @RequestBody OrderRequestDto order) {
+        OrderResponseDto createdOrder = orderService.createOrder(id, order);
         return ResponseEntity.created(URI.create("/orders/" + createdOrder.getId()))
                 .body(createdOrder);
     }
 
     @PutMapping("/orders/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable long id, @RequestBody Order order) {
+    public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable long id,
+                                                        @Valid @RequestBody OrderRequestDto order) {
         return ResponseEntity.ok(orderService.updateEntireOrder(id, order));
     }
 
     @PatchMapping("/orders/{id}")
-    public ResponseEntity<Order> patchOrder(@PathVariable long id, @RequestBody Order order) {
+    public ResponseEntity<OrderResponseDto> patchOrder(@PathVariable long id,
+                                                       @RequestBody OrderRequestDto order) {
         return ResponseEntity.ok(orderService.updatePartiallyOrder(id, order));
     }
 
     @DeleteMapping("/orders/{id}")
-    public ResponseEntity<Order> deleteOrder(@PathVariable long id) {
+    public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable long id) {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/orders")
-    public List<Order> getOrdersPageable(
+    public List<OrderResponseDto> getOrdersPageable(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -53,12 +58,12 @@ public class OrderController {
     }
 
     @GetMapping("/orders/{id}")
-    public Order getOrder(@PathVariable long id) {
+    public OrderResponseDto getOrder(@PathVariable long id) {
         return orderService.getOrderById(id);
     }
 
     @GetMapping("/orders/price")
-    public List<Order> getOrdersByPrice(
+    public List<OrderResponseDto> getOrdersByPrice(
             @RequestParam(defaultValue = "0") double minPrice,
             @RequestParam(defaultValue = "0") double maxPrice,
             @RequestParam(defaultValue = "0") int page,
@@ -67,7 +72,7 @@ public class OrderController {
     }
 
     @GetMapping(value = "/orders", params = "userId")
-    List<Order> getOrdersByUserId(
+    List<OrderResponseDto> getOrdersByUserId(
             @RequestParam Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
