@@ -26,6 +26,7 @@ public class UserService {
     private final CustomCache cache;
 
     private static final String INVALID_ID_MESSAGE = "Invalid user id";
+    private static final String USER_NOT_FOUND_MESSAGE = "User with id %d not found";
 
     @Transactional
     public UserResponseDto createUser(UserRequestDto user) {
@@ -49,7 +50,8 @@ public class UserService {
         }
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(USER_NOT_FOUND_MESSAGE, id)));
 
         existingUser.setEmail(newUser.getEmail());
         existingUser.setName(newUser.getName());
@@ -68,7 +70,8 @@ public class UserService {
         }
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(USER_NOT_FOUND_MESSAGE, id)));
 
         if ((newUser.getEmail() == null || newUser.getEmail().isBlank())
                 && (newUser.getName() == null || newUser.getName().isBlank())) {
@@ -110,7 +113,7 @@ public class UserService {
             user.ifPresent(value -> value.getOrders()
                     .forEach(order -> cache.getOrderCache().remove(order.getId())));
         } else {
-            throw new NotFoundException("User with id " + id + " not found");
+            throw new NotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id));
         }
     }
 
@@ -141,7 +144,8 @@ public class UserService {
         }
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(USER_NOT_FOUND_MESSAGE, id)));
         UserResponseDto userDto = new UserResponseDto(user);
 
         cache.getUserCache().put(id, userDto);

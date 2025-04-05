@@ -28,6 +28,7 @@ public class OrderService {
     private final CustomCache cache;
 
     private static final String INVALID_ID_MESSAGE = "Invalid order id";
+    private static final String ORDER_NOT_FOUND_MESSAGE = "Order with id %d not found";
 
     @Transactional
     public OrderResponseDto createOrder(Long id, OrderRequestDto order) {
@@ -56,7 +57,8 @@ public class OrderService {
         }
 
         Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Order with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(ORDER_NOT_FOUND_MESSAGE, id)));
 
         existingOrder.setDescription(newOrder.getDescription());
         existingOrder.setPrice(newOrder.getPrice());
@@ -75,7 +77,8 @@ public class OrderService {
         }
 
         Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Order with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(ORDER_NOT_FOUND_MESSAGE, id)));
 
         if ((newOrder.getDescription() == null || newOrder.getDescription().isBlank())
             && (newOrder.getPrice() == null || newOrder.getPrice() <= 0)) {
@@ -117,7 +120,7 @@ public class OrderService {
             cache.getOrderCache().remove(id);
             order.ifPresent(value -> cache.getUserCache().remove(value.getUser().getId()));
         } else {
-            throw new NotFoundException("Order with id " + id + " not found");
+            throw new NotFoundException(String.format(ORDER_NOT_FOUND_MESSAGE, id));
         }
     }
 
@@ -147,7 +150,8 @@ public class OrderService {
         }
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Order with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(ORDER_NOT_FOUND_MESSAGE, id)));
         OrderResponseDto orderDto = new OrderResponseDto(order);
 
         cache.getOrderCache().put(id, orderDto);
