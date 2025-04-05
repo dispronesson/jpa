@@ -1,15 +1,13 @@
 package com.example.demo.dto;
 
 import com.example.demo.model.Order;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class OrderResponseDto {
     private Long id;
     private String description;
