@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @Pointcut("within(com.example.demo.*)")
+    @Pointcut("within(com.example.demo..*)")
     public void allDemoMethods() {}
 
     @Before("allDemoMethods()")
