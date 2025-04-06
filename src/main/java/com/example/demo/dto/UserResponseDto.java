@@ -12,10 +12,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto {
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Long id;
     private String name;
     private String email;

@@ -45,7 +45,7 @@ public class OrderService {
         newOrder.setUser(user);
 
         orderRepository.save(newOrder);
-        cache.getUserCache().remove(id);
+        cache.removeUser(id);
 
         return new OrderResponseDto(newOrder);
     }
@@ -64,8 +64,8 @@ public class OrderService {
         existingOrder.setPrice(newOrder.getPrice());
         orderRepository.save(existingOrder);
 
-        cache.getOrderCache().remove(id);
-        cache.getUserCache().remove(existingOrder.getUser().getId());
+        cache.removeOrder(id);
+        cache.removeUser(existingOrder.getUser().getId());
 
         return new OrderResponseDto(existingOrder);
     }
@@ -102,8 +102,8 @@ public class OrderService {
 
         orderRepository.save(existingOrder);
 
-        cache.getOrderCache().remove(id);
-        cache.getUserCache().remove(existingOrder.getUser().getId());
+        cache.removeOrder(id);
+        cache.removeUser(existingOrder.getUser().getId());
 
         return new OrderResponseDto(existingOrder);
     }
@@ -117,8 +117,8 @@ public class OrderService {
         if (orderRepository.existsById(id)) {
             Optional<Order> order = orderRepository.findById(id);
             orderRepository.deleteById(id);
-            cache.getOrderCache().remove(id);
-            order.ifPresent(value -> cache.getUserCache().remove(value.getUser().getId()));
+            cache.removeOrder(id);
+            order.ifPresent(value -> cache.removeUser(value.getUser().getId()));
         } else {
             throw new NotFoundException(String.format(ORDER_NOT_FOUND_MESSAGE, id));
         }
@@ -146,7 +146,7 @@ public class OrderService {
         }
 
         if (cache.getOrderCache().containsKey(id)) {
-            return cache.getOrderCache().get(id);
+            return cache.getOrder(id);
         }
 
         Order order = orderRepository.findById(id)
@@ -154,7 +154,7 @@ public class OrderService {
                         .format(ORDER_NOT_FOUND_MESSAGE, id)));
         OrderResponseDto orderDto = new OrderResponseDto(order);
 
-        cache.getOrderCache().put(id, orderDto);
+        cache.putOrder(id, orderDto);
 
         return orderDto;
     }

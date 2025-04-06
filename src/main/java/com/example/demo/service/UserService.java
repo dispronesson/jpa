@@ -27,11 +27,13 @@ public class UserService {
 
     private static final String INVALID_ID_MESSAGE = "Invalid user id";
     private static final String USER_NOT_FOUND_MESSAGE = "User with id %d not found";
+    private static final String EMAIL_ALREADY_EXISTS_MESSAGE = "User with email %s already exists";
 
     @Transactional
     public UserResponseDto createUser(UserRequestDto user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ConflictException("User with email " + user.getEmail() + " already exists");
+            throw new ConflictException(String
+                    .format(EMAIL_ALREADY_EXISTS_MESSAGE, user.getEmail()));
         }
 
         User newUser = new User();
@@ -45,33 +47,21 @@ public class UserService {
 
     @Transactional
     public UserResponseDto updateEntireUser(Long id, UserRequestDto newUser) {
-        if (id <= 0) {
-            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
-        }
-
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String
-                        .format(USER_NOT_FOUND_MESSAGE, id)));
+        User existingUser = checkUser(id, newUser);
 
         existingUser.setEmail(newUser.getEmail());
         existingUser.setName(newUser.getName());
 
         userRepository.save(existingUser);
 
-        cache.getUserCache().remove(id);
+        cache.removeUser(id);
 
         return new UserResponseDto(existingUser);
     }
 
     @Transactional
     public UserResponseDto updatePartiallyUser(Long id, UserRequestDto newUser) {
-        if (id <= 0) {
-            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
-        }
-
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String
-                        .format(USER_NOT_FOUND_MESSAGE, id)));
+        User existingUser = checkUser(id, newUser);
 
         if ((newUser.getEmail() == null || newUser.getEmail().isBlank())
                 && (newUser.getName() == null || newUser.getName().isBlank())) {
@@ -95,7 +85,7 @@ public class UserService {
 
         userRepository.save(existingUser);
 
-        cache.getUserCache().remove(id);
+        cache.removeUser(id);
 
         return new UserResponseDto(existingUser);
     }
@@ -109,9 +99,9 @@ public class UserService {
         if (userRepository.existsById(id)) {
             Optional<User> user = userRepository.findById(id);
             userRepository.deleteById(id);
-            cache.getUserCache().remove(id);
+            cache.removeUser(id);
             user.ifPresent(value -> value.getOrders()
-                    .forEach(order -> cache.getOrderCache().remove(order.getId())));
+                    .forEach(order -> cache.removeOrder(order.getId())));
         } else {
             throw new NotFoundException(String.format(USER_NOT_FOUND_MESSAGE, id));
         }
@@ -140,7 +130,7 @@ public class UserService {
         }
 
         if (cache.getUserCache().containsKey(id)) {
-            return cache.getUserCache().get(id);
+            return cache.getUser(id);
         }
 
         User user = userRepository.findById(id)
@@ -148,7 +138,7 @@ public class UserService {
                         .format(USER_NOT_FOUND_MESSAGE, id)));
         UserResponseDto userDto = new UserResponseDto(user);
 
-        cache.getUserCache().put(id, userDto);
+        cache.putUser(id, userDto);
         
         return userDto;
     }
@@ -162,5 +152,22 @@ public class UserService {
         List<User> users = userRepository.findByOrdersIsEmpty();
         users.forEach(user -> user.setOrders(null));
         return users.stream().map(UserResponseDto::new).toList();
+    }
+
+    private User checkUser(Long id, UserRequestDto newUser) {
+        if (id <= 0) {
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
+        }
+
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(USER_NOT_FOUND_MESSAGE, id)));
+
+        if (userRepository.existsByEmail(newUser.getEmail())) {
+            throw new ConflictException(String
+                    .format(EMAIL_ALREADY_EXISTS_MESSAGE, newUser.getEmail()));
+        }
+
+        return existingUser;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad request",
+                "Bad Request",
                 "Validation failed",
                 errors,
                 buildRequestPath(request)
@@ -58,7 +59,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Bad request",
+                "Bad Request",
                 ex.getMessage(),
                 null,
                 buildRequestPath(request)
@@ -73,12 +74,27 @@ public class GlobalExceptionHandler {
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
-                "Not found",
+                "Not Found",
                 ex.getMessage(),
                 null,
                 buildRequestPath(request)
         );
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ErrorResponse> handleIoException(
+            IOException ex, HttpServletRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                "Error with file: " + ex.getMessage(),
+                null,
+                buildRequestPath(request)
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
