@@ -2,9 +2,8 @@ package com.example.demo.dto;
 
 import com.example.demo.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -9,9 +9,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class LogFileService {
+    private LogFileService() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static List<String> getLogsByDate(String logFilePath, String date) throws IOException {
         try (Stream<String> stream = Files.lines(Paths.get(logFilePath))) {
-            return stream.filter(line -> line.startsWith(date)).collect(Collectors.toList());
+            return stream.filter(line -> line.startsWith(date)).toList();
         }
     }
 

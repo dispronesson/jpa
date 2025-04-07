@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
+    private static final String USER_CACHE = "userCache";
+    private static final String ORDER_CACHE = "orderCache";
 
     @Pointcut(
             "within(com.example.demo..*)"
@@ -61,7 +63,7 @@ public class LoggingAspect {
     @After("execution(* com.example.demo.component.CustomCache.put*(..))")
     public void linkedHashMapPut(JoinPoint joinPoint) {
         String methodName = joinPoint.getSignature().getName();
-        String cacheName = methodName.toLowerCase().contains("user") ? "userCache" : "orderCache";
+        String cacheName = methodName.toLowerCase().contains("user") ? USER_CACHE : ORDER_CACHE;
         Object key = joinPoint.getArgs()[0];
         Object value = joinPoint.getArgs()[1];
         logger.info("[CACHE] {} with key '{}' was saved in {}", value, key, cacheName);
@@ -73,7 +75,7 @@ public class LoggingAspect {
     )
     public void linkedHashMapRemove(JoinPoint joinPoint, Object result) {
         String methodName = joinPoint.getSignature().getName();
-        String cacheName = methodName.toLowerCase().contains("user") ? "userCache" : "orderCache";
+        String cacheName = methodName.toLowerCase().contains("user") ? USER_CACHE : ORDER_CACHE;
         Object key = joinPoint.getArgs()[0];
         if (result != null) {
             logger.info("[CACHE] {} with key '{}' was removed from {}", result, key, cacheName);
@@ -89,7 +91,7 @@ public class LoggingAspect {
     )
     public void linkedHashMapGet(JoinPoint joinPoint, Object result) {
         String methodName = joinPoint.getSignature().getName();
-        String cacheName = methodName.toLowerCase().contains("user") ? "userCache" : "orderCache";
+        String cacheName = methodName.toLowerCase().contains("user") ? USER_CACHE : ORDER_CACHE;
         Object key = joinPoint.getArgs()[0];
         if (result != null) {
             logger.info("[CACHE] {} with key '{}' was received from {}", result, key, cacheName);
