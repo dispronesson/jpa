@@ -81,7 +81,7 @@ public class OrderController {
         return orderService.getOrdersByPrice(minPrice, maxPrice, page, size).getContent();
     }
 
-    @GetMapping(value = "/orders/user/{userId}")
+    @GetMapping(value = "/users/{userId}/orders")
     @Operation(summary = "Получение списка заказов конкретного пользователя с пагинацией")
     List<OrderResponseDto> getOrdersByUserId(
             @PathVariable Long userId,

@@ -13,11 +13,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto {
-    @EqualsAndHashCode.Include
     @ToString.Include
     @Schema(description = "Уникальный идентификатор пользователя", example = "3")
     private Long id;

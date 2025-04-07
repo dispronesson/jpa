@@ -11,10 +11,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 public class OrderResponseDto {
-    @EqualsAndHashCode.Include
     @ToString.Include
     @Schema(description = "Уникальный идентификатор заказа", example = "5")
     private Long id;

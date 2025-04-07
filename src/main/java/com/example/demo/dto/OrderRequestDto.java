@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import lombok.Setter;
 @Setter
 public class OrderRequestDto {
     @NotBlank(message = "Description cannot be blank or null")
+    @Size(min = 2, max = 50, message = "Description must be 2-50 length")
     @Schema(description = "Описание заказа", example = "TV")
     private String description;
 

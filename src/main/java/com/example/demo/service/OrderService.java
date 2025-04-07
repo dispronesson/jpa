@@ -174,23 +174,21 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
 
+        List<OrderResponseDto> ordersDto;
+        Page<Order> ordersPage;
+
         if (maxPrice == 0) {
-            Page<Order> ordersPage = orderRepository.findByPriceGreaterOrEqual(pageable, minPrice);
-            List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                    .map(OrderResponseDto::new).toList();
-            return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
+            ordersPage = orderRepository.findByPriceGreaterOrEqual(pageable, minPrice);
+            ordersDto = ordersPage.getContent().stream().map(OrderResponseDto::new).toList();
         } else if (minPrice == 0) {
-            Page<Order> ordersPage = orderRepository.findByPriceLessOrEqual(pageable, maxPrice);
-            List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                    .map(OrderResponseDto::new).toList();
-            return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
+            ordersPage = orderRepository.findByPriceLessOrEqual(pageable, maxPrice);
+            ordersDto = ordersPage.getContent().stream().map(OrderResponseDto::new).toList();
         } else {
-            Page<Order> ordersPage = orderRepository
-                    .findByPriceBetween(pageable, minPrice, maxPrice);
-            List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                    .map(OrderResponseDto::new).toList();
-            return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
+            ordersPage = orderRepository.findByPriceBetween(pageable, minPrice, maxPrice);
+            ordersDto = ordersPage.getContent().stream().map(OrderResponseDto::new).toList();
         }
+
+        return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
 
     public Page<OrderResponseDto> getOrdersByUserId(Long userId, int page, int size) {
