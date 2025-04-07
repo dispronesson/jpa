@@ -4,6 +4,8 @@ import com.example.demo.dto.UserRequestDto;
 import com.example.demo.dto.UserResponseDto;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -23,10 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(name = "Пользователи", description = "Взаимодействие с пользователями")
 public class UserController {
     public final UserService userService;
 
     @PostMapping
+    @Operation(summary = "Создание нового пользователя")
     public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto user) {
         UserResponseDto createdUser = userService.createUser(user);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId()))
@@ -34,24 +38,28 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Изменение существующего пользователя целиком")
     public ResponseEntity<UserResponseDto> updateUser(@PathVariable long id,
                                                       @Valid @RequestBody UserRequestDto user) {
         return ResponseEntity.ok(userService.updateEntireUser(id, user));
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Изменение существующего пользователя частично")
     public ResponseEntity<UserResponseDto> patchUser(@PathVariable long id,
                                                      @RequestBody UserRequestDto user) {
         return ResponseEntity.ok(userService.updatePartiallyUser(id, user));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Удаление существующего пользователя")
     public ResponseEntity<User> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
+    @Operation(summary = "Получение списка пользователей с пагинацией")
     public List<UserResponseDto> getUsersPageable(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -60,16 +68,19 @@ public class UserController {
     }
 
     @GetMapping("/with-orders")
+    @Operation(summary = "Получение списка всех пользователей с заказами")
     public List<UserResponseDto> getUsersWithOrders() {
         return userService.getUsersWithOrders();
     }
 
     @GetMapping("/without-orders")
+    @Operation(summary = "Получение списка всех пользователей без заказов")
     public List<UserResponseDto> getUsersWithoutOrders() {
         return userService.getUsersWithoutOrders();
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Получение конкретного пользователя")
     public UserResponseDto getUser(@PathVariable long id) {
         return userService.getUserById(id);
     }

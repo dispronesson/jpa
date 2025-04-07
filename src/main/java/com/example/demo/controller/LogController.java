@@ -7,6 +7,10 @@ import com.example.demo.util.LogFileService;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -19,11 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
 @RequestMapping("/logs")
+@Tag(name = "Логи", description = "Взаимодействие с логами")
 public class LogController {
-    private static final String LOG_FILE_PATH = "logs/app.lo";
+    private static final String LOG_FILE_PATH = "logs/app.log";
 
     @GetMapping("/{date}")
-    public ResponseEntity<Resource> getLogFile(@PathVariable String date) throws IOException {
+    @Operation(summary = "Получение лога по дате")
+    public ResponseEntity<Resource> getLogFile(
+            @PathVariable
+            @Parameter(description = "Запрашиваемая дата лога", example = "2025.04.07")
+            String date) throws IOException {
         if (!DateValidator.isValidDate(date)) {
             throw new InvalidArgumentsException("Invalid date format. "
                     + "Required in the form of 'yyyy-mm-dd'");

@@ -3,6 +3,8 @@ package com.example.demo.dto;
 import com.example.demo.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +20,13 @@ import lombok.ToString;
 public class UserResponseDto {
     @EqualsAndHashCode.Include
     @ToString.Include
+    @Schema(description = "Уникальный идентификатор пользователя", example = "3")
     private Long id;
+    @Schema(description = "Имя пользователя", example = "Alex")
     private String name;
+    @Schema(description = "Электронная почта пользователя", example = "alex@gmail.com")
     private String email;
+    @Schema(description = "Список заказов пользователя")
     private List<OrderResponseDto> orders;
 
     public UserResponseDto(User user) {
