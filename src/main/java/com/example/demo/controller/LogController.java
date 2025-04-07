@@ -30,7 +30,7 @@ public class LogController {
     @Operation(summary = "Получение лога по дате")
     public ResponseEntity<Resource> getLogFile(
             @PathVariable
-            @Parameter(description = "Запрашиваемая дата лога", example = "2025.04.07")
+            @Parameter(description = "Запрашиваемая дата лога", example = "2025-04-07")
             String date) throws IOException {
         if (!DateValidator.isValidDate(date)) {
             throw new InvalidArgumentsException("Invalid date format. "
