@@ -159,15 +159,13 @@ public class UserService {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String
-                        .format(USER_NOT_FOUND_MESSAGE, id)));
-
         if (userRepository.existsByEmail(newUser.getEmail())) {
             throw new ConflictException(String
                     .format(EMAIL_ALREADY_EXISTS_MESSAGE, newUser.getEmail()));
         }
 
-        return existingUser;
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(USER_NOT_FOUND_MESSAGE, id)));
     }
 }

@@ -86,7 +86,7 @@ public class LoggingAspect {
 
     @AfterReturning(
             value = "execution(* com.example.demo.component.CustomCache.getUser(..))"
-            + "|| execution(* com.example.demo.component.CustomCache.getOrder())",
+            + "|| execution(* com.example.demo.component.CustomCache.getOrder(..))",
             returning = "result"
     )
     public void linkedHashMapGet(JoinPoint joinPoint, Object result) {

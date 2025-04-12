@@ -15,11 +15,11 @@ import lombok.Setter;
 public class OrderRequestDto {
     @NotBlank(message = "Description cannot be blank or null")
     @Size(min = 2, max = 50, message = "Description must be 2-50 length")
-    @Schema(description = "Описание заказа", example = "TV")
+    @Schema(description = "Order description", example = "TV")
     private String description;
 
     @NotNull(message = "Price cannot be null")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
-    @Schema(description = "Цена заказа", example = "199.99")
+    @Schema(description = "Order price", example = "199.99")
     private Double price;
 }

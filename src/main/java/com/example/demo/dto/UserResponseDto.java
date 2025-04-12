@@ -4,7 +4,6 @@ import com.example.demo.model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,13 +16,13 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto {
     @ToString.Include
-    @Schema(description = "Уникальный идентификатор пользователя", example = "3")
+    @Schema(description = "Unique user ID", example = "3")
     private Long id;
-    @Schema(description = "Имя пользователя", example = "Alex")
+    @Schema(description = "User's name", example = "Alex")
     private String name;
-    @Schema(description = "Электронная почта пользователя", example = "alex@gmail.com")
+    @Schema(description = "User's email", example = "alex@gmail.com")
     private String email;
-    @Schema(description = "Список заказов пользователя")
+    @Schema(description = "List of user's orders")
     private List<OrderResponseDto> orders;
 
     public UserResponseDto(User user) {

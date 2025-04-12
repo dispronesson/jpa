@@ -22,42 +22,48 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Заказы", description = "Взаимодействие с заказами")
+@Tag(name = "Orders", description = "Interaction with orders")
 public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/users/{userId}/order")
-    @Operation(summary = "Создание нового заказа")
-    public ResponseEntity<OrderResponseDto> createOrder(@PathVariable long userId,
-                                                        @Valid @RequestBody OrderRequestDto order) {
+    @Operation(summary = "Creating a new order")
+    public ResponseEntity<OrderResponseDto> createOrder(
+            @PathVariable long userId,
+            @Valid @RequestBody OrderRequestDto order
+    ) {
         OrderResponseDto createdOrder = orderService.createOrder(userId, order);
         return ResponseEntity.created(URI.create("/orders/" + createdOrder.getId()))
                 .body(createdOrder);
     }
 
     @PutMapping("/orders/{id}")
-    @Operation(summary = "Изменение существующего заказа целиком")
-    public ResponseEntity<OrderResponseDto> updateOrder(@PathVariable long id,
-                                                        @Valid @RequestBody OrderRequestDto order) {
+    @Operation(summary = "Changing an existing order entirely")
+    public ResponseEntity<OrderResponseDto> updateOrder(
+            @PathVariable long id,
+            @Valid @RequestBody OrderRequestDto order
+    ) {
         return ResponseEntity.ok(orderService.updateEntireOrder(id, order));
     }
 
     @PatchMapping("/orders/{id}")
-    @Operation(summary = "Изменение существующего заказа частично")
-    public ResponseEntity<OrderResponseDto> patchOrder(@PathVariable long id,
-                                                       @RequestBody OrderRequestDto order) {
+    @Operation(summary = "Changing an existing order partially")
+    public ResponseEntity<OrderResponseDto> patchOrder(
+            @PathVariable long id,
+            @RequestBody OrderRequestDto order
+    ) {
         return ResponseEntity.ok(orderService.updatePartiallyOrder(id, order));
     }
 
     @DeleteMapping("/orders/{id}")
-    @Operation(summary = "Удаление существующего заказа")
+    @Operation(summary = "Deleting an existing order")
     public ResponseEntity<OrderResponseDto> deleteOrder(@PathVariable long id) {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/orders")
-    @Operation(summary = "Получение списка заказов с пагинацией")
+    @Operation(summary = "Getting a list of paginated orders")
     public List<OrderResponseDto> getOrdersPageable(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -66,27 +72,38 @@ public class OrderController {
     }
 
     @GetMapping("/orders/{id}")
-    @Operation(summary = "Получение конкретного заказа")
+    @Operation(summary = "Getting a specific order")
     public OrderResponseDto getOrder(@PathVariable long id) {
         return orderService.getOrderById(id);
     }
 
-    @GetMapping("/orders/price")
-    @Operation(summary = "Получение списка заказов с фильтрацией и пагинацией")
-    public List<OrderResponseDto> getOrdersByPrice(
-            @RequestParam(defaultValue = "0") double minPrice,
-            @RequestParam(defaultValue = "0") double maxPrice,
+    @GetMapping(value = "/orders/by-user-name")
+    @Operation(summary = "Getting a list of paginated orders with specific user's name")
+    public List<OrderResponseDto> getOrdersByUserName(
+            @RequestParam String userName,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return orderService.getOrdersByPrice(minPrice, maxPrice, page, size).getContent();
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return orderService.getOrdersByUserName(userName, page, size).getContent();
+    }
+
+    @GetMapping(value = "/orders/by-user-email")
+    @Operation(summary = "Getting a list of paginated orders with specific user's email")
+    public List<OrderResponseDto> getOrdersByUserEmail(
+            @RequestParam String userEmail,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return orderService.getOrdersByUserEmail(userEmail, page, size).getContent();
     }
 
     @GetMapping(value = "/users/{userId}/orders")
-    @Operation(summary = "Получение списка заказов конкретного пользователя с пагинацией")
+    @Operation(summary = "Getting a list of paginated orders from a specific user")
     List<OrderResponseDto> getOrdersByUserId(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         return orderService.getOrdersByUserId(userId, page, size).getContent();
     }
 }

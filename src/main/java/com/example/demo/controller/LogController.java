@@ -22,19 +22,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
 @RequestMapping("/logs")
-@Tag(name = "Логи", description = "Взаимодействие с логами")
+@Tag(name = "Logs", description = "Interaction with logs")
 public class LogController {
     private static final String LOG_FILE_PATH = "logs/app.log";
 
     @GetMapping("/{date}")
-    @Operation(summary = "Получение лога по дате")
+    @Operation(summary = "Getting the log by date")
     public ResponseEntity<Resource> getLogFile(
-            @PathVariable
-            @Parameter(description = "Запрашиваемая дата лога", example = "2025-04-07")
-            String date) throws IOException {
+            @PathVariable @Parameter(description = "Log date", example = "2025-04-07")
+            String date
+    ) throws IOException {
         if (!DateValidator.isValidDate(date)) {
             throw new InvalidArgumentsException("Invalid date format. "
-                    + "Required in the form of 'yyyy-mm-dd'");
+                    + "Required in the form of 'yyyy-MM-dd'");
         }
 
         List<String> logs = LogFileService.getLogsByDate(LOG_FILE_PATH, date);

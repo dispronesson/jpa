@@ -14,11 +14,11 @@ import lombok.Setter;
 public class UserRequestDto {
     @NotBlank(message = "Name cannot be blank or null")
     @Size(min = 2, max = 50, message = "Name must be 2-50 length")
-    @Schema(description = "Имя пользователя", example = "Alex")
+    @Schema(description = "User's name", example = "Alex")
     private String name;
 
     @NotBlank(message = "Email cannot be blank or null")
     @Email(message = "Invalid email format")
-    @Schema(description = "Электронная почта пользователя", example = "alex@gmail.com")
+    @Schema(description = "User's email", example = "alex@gmail.com")
     private String email;
 }

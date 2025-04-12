@@ -52,13 +52,7 @@ public class OrderService {
 
     @Transactional
     public OrderResponseDto updateEntireOrder(Long id, OrderRequestDto newOrder) {
-        if (id <= 0) {
-            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
-        }
-
-        Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String
-                        .format(ORDER_NOT_FOUND_MESSAGE, id)));
+        Order existingOrder = checkOrder(id);
 
         existingOrder.setDescription(newOrder.getDescription());
         existingOrder.setPrice(newOrder.getPrice());
@@ -72,16 +66,10 @@ public class OrderService {
 
     @Transactional
     public OrderResponseDto updatePartiallyOrder(Long id, OrderRequestDto newOrder) {
-        if (id <= 0) {
-            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
-        }
-
-        Order existingOrder = orderRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(String
-                        .format(ORDER_NOT_FOUND_MESSAGE, id)));
+        Order existingOrder = checkOrder(id);
 
         if ((newOrder.getDescription() == null || newOrder.getDescription().isBlank())
-            && (newOrder.getPrice() == null || newOrder.getPrice() <= 0)) {
+                && (newOrder.getPrice() == null || newOrder.getPrice() <= 0)) {
             throw new InvalidArgumentsException("Description and price cannot be null"
                                                 + " or blank at the same time");
         }
@@ -125,15 +113,10 @@ public class OrderService {
     }
 
     public Page<OrderResponseDto> getOrdersPageable(int page, int size) {
-        if (page < 0) {
-            throw new InvalidArgumentsException("Page number cannot be negative");
-        } else if (size <= 0) {
-            throw new InvalidArgumentsException("Page size cannot be negative or zero");
-        }
+        checkPageAndSize(page, size);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Order> ordersPage = orderRepository.findOrdersPageable(pageable);
-
         List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
                 .map(OrderResponseDto::new).toList();
 
@@ -159,34 +142,32 @@ public class OrderService {
         return orderDto;
     }
 
-    public Page<OrderResponseDto> getOrdersByPrice(Double minPrice, Double maxPrice,
-                                                   int page, int size) {
-        if (page < 0) {
-            throw new InvalidArgumentsException("Page number cannot be negative");
-        } else if (size <= 0) {
-            throw new InvalidArgumentsException("Page size cannot be negative or zero");
+    public Page<OrderResponseDto> getOrdersByUserName(String userName, int page, int size) {
+        if (userName.isBlank()) {
+            throw new InvalidArgumentsException("User name cannot be blank");
         }
 
-        if (minPrice < 0 || maxPrice < 0 || (minPrice > maxPrice && maxPrice != 0)
-            || (minPrice == 0 && maxPrice == 0)) {
-            throw new InvalidArgumentsException("Invalid price range");
-        }
+        checkPageAndSize(page, size);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Order> ordersPage = orderRepository.findByUserName(userName, pageable);
+        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                .map(OrderResponseDto::new).toList();
 
-        List<OrderResponseDto> ordersDto;
-        Page<Order> ordersPage;
+        return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
+    }
 
-        if (maxPrice == 0) {
-            ordersPage = orderRepository.findByPriceGreaterOrEqual(pageable, minPrice);
-            ordersDto = ordersPage.getContent().stream().map(OrderResponseDto::new).toList();
-        } else if (minPrice == 0) {
-            ordersPage = orderRepository.findByPriceLessOrEqual(pageable, maxPrice);
-            ordersDto = ordersPage.getContent().stream().map(OrderResponseDto::new).toList();
-        } else {
-            ordersPage = orderRepository.findByPriceBetween(pageable, minPrice, maxPrice);
-            ordersDto = ordersPage.getContent().stream().map(OrderResponseDto::new).toList();
+    public Page<OrderResponseDto> getOrdersByUserEmail(String userEmail, int page, int size) {
+        if (userEmail.isBlank()) {
+            throw new InvalidArgumentsException("User email cannot be blank");
         }
+
+        checkPageAndSize(page, size);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        Page<Order> ordersPage = orderRepository.findByUserEmail(userEmail, pageable);
+        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
+                .map(OrderResponseDto::new).toList();
 
         return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
@@ -199,11 +180,7 @@ public class OrderService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
-        if (page < 0) {
-            throw new InvalidArgumentsException("Page number cannot be negative");
-        } else if (size <= 0) {
-            throw new InvalidArgumentsException("Page size cannot be negative or zero");
-        }
+        checkPageAndSize(page, size);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Order> ordersPage = orderRepository.findByUserId(userId, pageable);
@@ -211,5 +188,23 @@ public class OrderService {
                 .map(OrderResponseDto::new).toList();
 
         return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
+    }
+
+    private Order checkOrder(Long id) {
+        if (id <= 0) {
+            throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
+        }
+
+        return  orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String
+                        .format(ORDER_NOT_FOUND_MESSAGE, id)));
+    }
+
+    private void checkPageAndSize(int page, int size) {
+        if (page < 0) {
+            throw new InvalidArgumentsException("Page number cannot be negative");
+        } else if (size <= 0) {
+            throw new InvalidArgumentsException("Page size cannot be negative or zero");
+        }
     }
 }
