@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "Interaction with users")
 public class UserController {
-    public final UserService userService;
+    private final UserService userService;
 
     @PostMapping
     @Operation(summary = "Creating a new user")
