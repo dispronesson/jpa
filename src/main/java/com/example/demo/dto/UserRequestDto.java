@@ -1,9 +1,11 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,4 +23,15 @@ public class UserRequestDto {
     @Email(message = "Invalid email format")
     @Schema(description = "User's email", example = "alex@gmail.com")
     private String email;
+
+    public static User toEntity(UserRequestDto dto) {
+        User entity = new User();
+        entity.setEmail(dto.getEmail());
+        entity.setName(dto.getName());
+        return entity;
+    }
+
+    public static List<User> toEntityList(List<UserRequestDto> dtoList) {
+        return dtoList.stream().map(UserRequestDto::toEntity).toList();
+    }
 }

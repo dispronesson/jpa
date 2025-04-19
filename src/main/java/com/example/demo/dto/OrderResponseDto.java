@@ -2,6 +2,7 @@ package com.example.demo.dto;
 
 import com.example.demo.model.Order;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,9 +21,15 @@ public class OrderResponseDto {
     @Schema(description = "Order price", example = "199.99")
     private Double price;
 
-    public OrderResponseDto(Order order) {
-        this.id = order.getId();
-        this.description = order.getDescription();
-        this.price = order.getPrice();
+    public static OrderResponseDto toDto(Order entity) {
+        OrderResponseDto dto = new OrderResponseDto();
+        dto.setId(entity.getId());
+        dto.setDescription(entity.getDescription());
+        dto.setPrice(entity.getPrice());
+        return dto;
+    }
+
+    public static List<OrderResponseDto> toDtoList(List<Order> entityList) {
+        return entityList.stream().map(OrderResponseDto::toDto).toList();
     }
 }

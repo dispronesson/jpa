@@ -25,14 +25,22 @@ public class UserResponseDto {
     @Schema(description = "List of user's orders")
     private List<OrderResponseDto> orders;
 
-    public UserResponseDto(User user) {
-        this.id = user.getId();
-        this.name = user.getName();
-        this.email = user.getEmail();
-        if (user.getOrders() != null) {
-            this.orders = user.getOrders().stream().map(OrderResponseDto::new).toList();
+    public static UserResponseDto toDto(User entity) {
+        UserResponseDto dto = new UserResponseDto();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setEmail(entity.getEmail());
+
+        if (entity.getOrders() != null) {
+            dto.setOrders(OrderResponseDto.toDtoList(entity.getOrders()));
         } else {
-            this.orders = null;
+            dto.setOrders(null);
         }
+
+        return dto;
+    }
+
+    public static List<UserResponseDto> toDtoList(List<User> entityList) {
+        return entityList.stream().map(UserResponseDto::toDto).toList();
     }
 }

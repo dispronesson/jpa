@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @EntityGraph(attributePaths = "orders")
     @NonNull
     Optional<User> findById(@NonNull Long id);
+
+    List<User> findAllByEmailIn(List<String> emails);
 }

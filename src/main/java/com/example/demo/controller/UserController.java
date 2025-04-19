@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,15 @@ public class UserController {
         UserResponseDto createdUser = userService.createUser(user);
         return ResponseEntity.created(URI.create("/users/" + createdUser.getId()))
                 .body(createdUser);
+    }
+
+    @PostMapping("/bulk")
+    @Operation(summary = "Creating new users")
+    public ResponseEntity<List<UserResponseDto>> createUsers(
+                    @Valid @RequestBody List<UserRequestDto> users
+    ) {
+        List<UserResponseDto> createdUsers = userService.createUsers(users);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUsers);
     }
 
     @PutMapping("/{id}")

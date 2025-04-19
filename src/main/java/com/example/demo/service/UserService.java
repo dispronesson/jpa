@@ -36,13 +36,29 @@ public class UserService {
                     .format(EMAIL_ALREADY_EXISTS_MESSAGE, user.getEmail()));
         }
 
-        User newUser = new User();
-        newUser.setEmail(user.getEmail());
-        newUser.setName(user.getName());
+        User newUser = UserRequestDto.toEntity(user);
 
         userRepository.save(newUser);
 
-        return new UserResponseDto(newUser);
+        return UserResponseDto.toDto(newUser);
+    }
+
+    @Transactional
+    public List<UserResponseDto> createUsers(List<UserRequestDto> users) {
+        List<String> emails = users.stream()
+                .map(UserRequestDto::getEmail).toList();
+
+        List<String> existingEmails = userRepository.findAllByEmailIn(emails)
+                .stream().map(User::getEmail).toList();
+
+        if (!existingEmails.isEmpty()) {
+            throw new ConflictException("Next emails already exist: " + existingEmails);
+        }
+
+        List<User> newUsers = UserRequestDto.toEntityList(users);
+        userRepository.saveAll(newUsers);
+
+        return UserResponseDto.toDtoList(newUsers);
     }
 
     @Transactional
@@ -56,7 +72,7 @@ public class UserService {
 
         cache.removeUser(id);
 
-        return new UserResponseDto(existingUser);
+        return UserResponseDto.toDto(existingUser);
     }
 
     @Transactional
@@ -87,7 +103,7 @@ public class UserService {
 
         cache.removeUser(id);
 
-        return new UserResponseDto(existingUser);
+        return UserResponseDto.toDto(existingUser);
     }
 
     @Transactional
@@ -118,8 +134,7 @@ public class UserService {
         Page<User> usersPage = userRepository.findUsersPageable(pageable);
 
         usersPage.getContent().forEach(user -> user.setOrders(null));
-        List<UserResponseDto> usersDto = usersPage.getContent().stream()
-                .map(UserResponseDto::new).toList();
+        List<UserResponseDto> usersDto = UserResponseDto.toDtoList(usersPage.getContent());
 
         return new PageImpl<>(usersDto, pageable, usersPage.getTotalElements());
     }
@@ -129,14 +144,14 @@ public class UserService {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
-        if (cache.getUserCache().containsKey(id)) {
+        if (cache.containsUser(id)) {
             return cache.getUser(id);
         }
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String
                         .format(USER_NOT_FOUND_MESSAGE, id)));
-        UserResponseDto userDto = new UserResponseDto(user);
+        UserResponseDto userDto = UserResponseDto.toDto(user);
 
         cache.putUser(id, userDto);
         
@@ -144,14 +159,13 @@ public class UserService {
     }
 
     public List<UserResponseDto> getUsersWithOrders() {
-        return userRepository.findByOrdersIsNotEmpty().stream()
-                .map(UserResponseDto::new).toList();
+        return UserResponseDto.toDtoList(userRepository.findByOrdersIsNotEmpty());
     }
 
     public List<UserResponseDto> getUsersWithoutOrders() {
         List<User> users = userRepository.findByOrdersIsEmpty();
         users.forEach(user -> user.setOrders(null));
-        return users.stream().map(UserResponseDto::new).toList();
+        return UserResponseDto.toDtoList(users);
     }
 
     private User checkUser(Long id, UserRequestDto newUser) {

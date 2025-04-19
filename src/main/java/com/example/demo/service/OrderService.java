@@ -39,15 +39,12 @@ public class OrderService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
 
-        Order newOrder = new Order();
-        newOrder.setDescription(order.getDescription());
-        newOrder.setPrice(order.getPrice());
-        newOrder.setUser(user);
+        Order newOrder = OrderRequestDto.toEntity(order, user);
 
         orderRepository.save(newOrder);
         cache.removeUser(id);
 
-        return new OrderResponseDto(newOrder);
+        return OrderResponseDto.toDto(newOrder);
     }
 
     @Transactional
@@ -61,7 +58,7 @@ public class OrderService {
         cache.removeOrder(id);
         cache.removeUser(existingOrder.getUser().getId());
 
-        return new OrderResponseDto(existingOrder);
+        return OrderResponseDto.toDto(existingOrder);
     }
 
     @Transactional
@@ -93,7 +90,7 @@ public class OrderService {
         cache.removeOrder(id);
         cache.removeUser(existingOrder.getUser().getId());
 
-        return new OrderResponseDto(existingOrder);
+        return OrderResponseDto.toDto(existingOrder);
     }
 
     @Transactional
@@ -117,8 +114,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Order> ordersPage = orderRepository.findOrdersPageable(pageable);
-        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                .map(OrderResponseDto::new).toList();
+        List<OrderResponseDto> ordersDto = OrderResponseDto.toDtoList(ordersPage.getContent());
 
         return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
@@ -128,14 +124,14 @@ public class OrderService {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);
         }
 
-        if (cache.getOrderCache().containsKey(id)) {
+        if (cache.containsOrder(id)) {
             return cache.getOrder(id);
         }
 
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String
                         .format(ORDER_NOT_FOUND_MESSAGE, id)));
-        OrderResponseDto orderDto = new OrderResponseDto(order);
+        OrderResponseDto orderDto = OrderResponseDto.toDto(order);
 
         cache.putOrder(id, orderDto);
 
@@ -151,8 +147,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Order> ordersPage = orderRepository.findByUserName(userName, pageable);
-        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                .map(OrderResponseDto::new).toList();
+        List<OrderResponseDto> ordersDto = OrderResponseDto.toDtoList(ordersPage.getContent());
 
         return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
@@ -166,8 +161,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Order> ordersPage = orderRepository.findByUserEmail(userEmail, pageable);
-        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                .map(OrderResponseDto::new).toList();
+        List<OrderResponseDto> ordersDto = OrderResponseDto.toDtoList(ordersPage.getContent());
 
         return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
@@ -184,8 +178,7 @@ public class OrderService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         Page<Order> ordersPage = orderRepository.findByUserId(userId, pageable);
-        List<OrderResponseDto> ordersDto = ordersPage.getContent().stream()
-                .map(OrderResponseDto::new).toList();
+        List<OrderResponseDto> ordersDto = OrderResponseDto.toDtoList(ordersPage.getContent());
 
         return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }

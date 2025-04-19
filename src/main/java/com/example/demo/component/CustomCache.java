@@ -28,6 +28,10 @@ public class CustomCache {
         return userCache.remove(userId);
     }
 
+    public boolean containsUser(Long userId) {
+        return userCache.containsKey(userId);
+    }
+
     @SuppressWarnings("UnusedReturnValue")
     public OrderResponseDto putOrder(Long orderId, OrderResponseDto orderResponseDto) {
         return orderCache.put(orderId, orderResponseDto);
@@ -40,5 +44,9 @@ public class CustomCache {
     @SuppressWarnings("UnusedReturnValue")
     public OrderResponseDto removeOrder(Long orderId) {
         return orderCache.remove(orderId);
+    }
+
+    public boolean containsOrder(Long orderId) {
+        return orderCache.containsKey(orderId);
     }
 }

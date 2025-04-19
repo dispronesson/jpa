@@ -11,6 +11,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(onlyExplicitlyIncluded = true)
 public class User {
     @Id
