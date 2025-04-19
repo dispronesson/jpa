@@ -17,7 +17,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class UserServiceTest {
+class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
@@ -28,12 +28,12 @@ public class UserServiceTest {
     private UserService userService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void findUserById_whenUserExists_returnsUser() {
+    void findUserById_whenUserExists_returnsUser() {
         User user = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
 
         when(cache.containsUser(1L)).thenReturn(false);
@@ -47,7 +47,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findUserById_whenUserExistsInCache_returnsUser() {
+    void findUserById_whenUserExistsInCache_returnsUser() {
         User user = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
 
         when(cache.containsUser(1L)).thenReturn(true);
@@ -60,7 +60,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findUserById_whenUserDoesNotExist_throwException() {
+    void findUserById_whenUserDoesNotExist_throwException() {
         when(cache.containsUser(1L)).thenReturn(false);
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -68,7 +68,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findUserById_WhenIdIsInvalid_throwException() {
+    void findUserById_WhenIdIsInvalid_throwException() {
         assertThrows(InvalidArgumentsException.class, () -> userService.getUserById(-1L));
     }
 }
