@@ -33,6 +33,3 @@ build/
 .vscode/
 https
 logs
-mvnw
-mvnw.cmd
-.mvn/
