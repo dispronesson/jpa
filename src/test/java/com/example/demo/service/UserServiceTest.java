@@ -12,6 +12,8 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -175,8 +177,10 @@ class UserServiceTest {
 
     @Test
     void updateEntireUser_whenIdIsInvalid_throwException() {
+        UserRequestDto userRequestDto = new UserRequestDto();
+
         assertThrows(InvalidArgumentsException.class,
-                () -> userService.updateEntireUser(-1L, new UserRequestDto()));
+                () -> userService.updateEntireUser(-1L, userRequestDto));
     }
 
     @Test
@@ -236,8 +240,10 @@ class UserServiceTest {
 
     @Test
     void updatePartiallyUser_whenIdIsInvalid_throwException() {
+        UserRequestDto userRequestDto = new UserRequestDto();
+
         assertThrows(InvalidArgumentsException.class,
-                () -> userService.updatePartiallyUser(-1L, new UserRequestDto()));
+                () -> userService.updatePartiallyUser(-1L, userRequestDto));
     }
 
     @Test
@@ -259,34 +265,14 @@ class UserServiceTest {
         assertThrows(NotFoundException.class, () -> userService.updatePartiallyUser(1L, newUser));
     }
 
-    @Test
-    void updatePartiallyUser_whenEmailAndNameIsInvalid_throwException() {
-        UserRequestDto newUser = new UserRequestDto("  ", "  ");
-
-        User existingUser = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
-
-        when(userRepository.existsByEmail(newUser.getEmail())).thenReturn(false);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        assertThrows(InvalidArgumentsException.class,
-                () -> userService.updatePartiallyUser(1L, newUser));
-    }
-
-    @Test
-    void updatePartiallyUser_whenEmailIsBlank_throwException() {
-        UserRequestDto newUser = new UserRequestDto("Alex", "  ");
-
-        User existingUser = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
-
-        when(userRepository.existsByEmail(newUser.getEmail())).thenReturn(false);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        assertThrows(InvalidArgumentsException.class,
-                () -> userService.updatePartiallyUser(1L, newUser));
-    }
-
-    @Test
-    void updatePartiallyUser_whenNameIsBlank_throwException() {
-        UserRequestDto newUser = new UserRequestDto(" ", "AlexAlex@mail.ru");
-
+    @ParameterizedTest
+    @CsvSource({
+            "'  ', '  '",
+            "'Alex', '  '",
+            "'  ', 'AlexAlex@mail.ru'"
+    })
+    void updatePartiallyUser_withInvalidNameOrEmail_throwException(String name, String email) {
+        UserRequestDto newUser = new UserRequestDto(name, email);
         User existingUser = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
 
         when(userRepository.existsByEmail(newUser.getEmail())).thenReturn(false);
