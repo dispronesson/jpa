@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import com.example.demo.component.CustomCache;
 import com.example.demo.dto.OrderRequestDto;
 import com.example.demo.dto.OrderResponseDto;
-import com.example.demo.dto.UserResponseDto;
 import com.example.demo.exception.InvalidArgumentsException;
 import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.Order;
@@ -24,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderServiceTest {
+class OrderServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
@@ -39,16 +38,20 @@ public class OrderServiceTest {
 
     @Test
     void createOrder_whenUserIdIsInvalid_throwsException() {
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         assertThrows(InvalidArgumentsException.class,
-                () -> orderService.createOrder(-1L, new OrderRequestDto()));
+                () -> orderService.createOrder(-1L, orderRequestDto));
     }
 
     @Test
     void createdOrder_whenUserDoesNotExist_throwsException() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         assertThrows(NotFoundException.class,
-                () -> orderService.createOrder(1L, new OrderRequestDto()));
+                () -> orderService.createOrder(1L, orderRequestDto));
     }
 
     @Test
@@ -73,16 +76,20 @@ public class OrderServiceTest {
 
     @Test
     void updateEntireOrder_whenIdIsInvalid_throwsException() {
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         assertThrows(InvalidArgumentsException.class,
-                () -> orderService.updateEntireOrder(-1L, new OrderRequestDto()));
+                () -> orderService.updateEntireOrder(-1L, orderRequestDto));
     }
 
     @Test
     void updateEntireOrder_whenOrderDoesNotExist_throwsException() {
         when(orderRepository.findById(1L)).thenReturn(Optional.empty());
 
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         assertThrows(NotFoundException.class,
-                () -> orderService.updateEntireOrder(1L, new OrderRequestDto()));
+                () -> orderService.updateEntireOrder(1L, orderRequestDto));
     }
 
     @Test
@@ -106,16 +113,20 @@ public class OrderServiceTest {
 
     @Test
     void updatePartiallyOrder_whenIdIsInvalid_throwsException() {
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         assertThrows(InvalidArgumentsException.class,
-                () -> orderService.updatePartiallyOrder(-1L, new OrderRequestDto()));
+                () -> orderService.updatePartiallyOrder(-1L, orderRequestDto));
     }
 
     @Test
     void updatePartiallyOrder_whenOrderDoesNotExist_throwsException() {
         when(orderRepository.findById(1L)).thenReturn(Optional.empty());
 
+        OrderRequestDto orderRequestDto = new OrderRequestDto();
+
         assertThrows(NotFoundException.class,
-                () -> orderService.updatePartiallyOrder(1L, new OrderRequestDto()));
+                () -> orderService.updatePartiallyOrder(1L, orderRequestDto));
     }
 
     @Test
