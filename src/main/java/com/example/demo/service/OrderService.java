@@ -31,18 +31,18 @@ public class OrderService {
     private static final String ORDER_NOT_FOUND_MESSAGE = "Order with id %d not found";
 
     @Transactional
-    public OrderResponseDto createOrder(Long id, OrderRequestDto order) {
-        if (id <= 0) {
+    public OrderResponseDto createOrder(Long userId, OrderRequestDto order) {
+        if (userId <= 0) {
             throw new InvalidArgumentsException("Invalid user id");
         }
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
         Order newOrder = OrderRequestDto.toEntity(order, user);
 
         orderRepository.save(newOrder);
-        cache.removeUser(id);
+        cache.removeUser(userId);
 
         return OrderResponseDto.toDto(newOrder);
     }
