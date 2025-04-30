@@ -26,7 +26,7 @@ public class LogAsyncService {
         Path logFilePath = Paths.get(uniqueFileName);
         Files.write(logFilePath, log);
 
-        Thread.sleep(5000);
+        Thread.sleep(20000);
 
         logs.put(logId, logFilePath.toString());
     }
