@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/count")
+@RequestMapping("/api/count")
 @RequiredArgsConstructor
 @Tag(name = "Count", description = "Count of site visits")
 public class CountController {

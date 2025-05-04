@@ -17,10 +17,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -208,34 +204,6 @@ class UserServiceTest {
     @Test
     void deleteUser_whenIdIsInvalid_throwException() {
         assertThrows(InvalidArgumentsException.class, () -> userService.deleteUser(-1L));
-    }
-
-    @Test
-    void getUsersPageable_whenPageIsNegative_throwException() {
-        assertThrows(InvalidArgumentsException.class,
-                () -> userService.getUsersPageable(-1, 0));
-    }
-
-    @Test
-    void getUsersPageable_whenSizeIsNegativeOrZero_throwException() {
-        assertThrows(InvalidArgumentsException.class,
-                () -> userService.getUsersPageable(0, -5));
-    }
-
-    @Test
-    void getUsersPageable_whenArgumentsIsValid_returnsUsersPageable() {
-        Pageable pageable = PageRequest.of(1, 5);
-        List<User> users = List
-                .of(new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>()));
-        Page<User> usersPage = new PageImpl<>(users, pageable, users.size());
-
-        when(userRepository.findUsersPageable(any(Pageable.class))).thenReturn(usersPage);
-
-        Page<UserResponseDto> result = userService.getUsersPageable(1, 5);
-
-        assertEquals(usersPage.getTotalElements(), result.getTotalElements());
-        assertEquals(usersPage.getContent().getFirst().getId(),
-                result.getContent().getFirst().getId());
     }
 
     @Test

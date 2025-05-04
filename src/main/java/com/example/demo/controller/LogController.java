@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/logs")
+@RequestMapping("/api/logs")
 @Tag(name = "Logs", description = "Interaction with logs")
 public class LogController {
     private final LogService logService;

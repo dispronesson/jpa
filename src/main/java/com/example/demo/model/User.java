@@ -37,6 +37,5 @@ public class User {
     private String email;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OrderBy("id ASC")
     private List<Order> orders;
 }

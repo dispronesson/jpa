@@ -12,19 +12,10 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "Interaction with users")
 public class UserController {
@@ -73,29 +64,20 @@ public class UserController {
     }
 
     @GetMapping
-    @Operation(summary = "Getting a list of paginated users")
-    public List<UserResponseDto> getUsersPageable(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return userService.getUsersPageable(page, size).getContent();
-    }
-
-    @GetMapping("/with-orders")
-    @Operation(summary = "Getting a list of users with orders")
-    public List<UserResponseDto> getUsersWithOrders() {
-        return userService.getUsersWithOrders();
-    }
-
-    @GetMapping("/without-orders")
-    @Operation(summary = "Getting a list of users without orders")
-    public List<UserResponseDto> getUsersWithoutOrders() {
-        return userService.getUsersWithoutOrders();
+    @Operation(summary = "Getting a list of users")
+    public List<UserResponseDto> getUsers() {
+        return userService.getUsers();
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Getting a specific user")
-    public UserResponseDto getUser(@PathVariable long id) {
+    @Operation(summary = "Getting a specific user by id")
+    public UserResponseDto getUserById(@PathVariable long id) {
         return userService.getUserById(id);
+    }
+
+    @GetMapping("/email/{email}")
+    @Operation(summary = "Check a specific user by email")
+    public boolean existsUserByEmail(@PathVariable String email) {
+        return userService.existsUserByEmail(email);
     }
 }

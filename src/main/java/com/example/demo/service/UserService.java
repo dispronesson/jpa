@@ -12,11 +12,6 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -123,20 +118,8 @@ public class UserService {
         }
     }
 
-    public Page<UserResponseDto> getUsersPageable(int page, int size) {
-        if (page < 0) {
-            throw new InvalidArgumentsException("Page number cannot be negative");
-        } else if (size <= 0) {
-            throw new InvalidArgumentsException("Page size cannot be negative or zero");
-        }
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<User> usersPage = userRepository.findUsersPageable(pageable);
-
-        usersPage.getContent().forEach(user -> user.setOrders(null));
-        List<UserResponseDto> usersDto = UserResponseDto.toDtoList(usersPage.getContent());
-
-        return new PageImpl<>(usersDto, pageable, usersPage.getTotalElements());
+    public List<UserResponseDto> getUsers() {
+        return UserResponseDto.toDtoList(userRepository.findAll());
     }
 
     public UserResponseDto getUserById(Long id) {
@@ -158,14 +141,8 @@ public class UserService {
         return userDto;
     }
 
-    public List<UserResponseDto> getUsersWithOrders() {
-        return UserResponseDto.toDtoList(userRepository.findByOrdersIsNotEmpty());
-    }
-
-    public List<UserResponseDto> getUsersWithoutOrders() {
-        List<User> users = userRepository.findByOrdersIsEmpty();
-        users.forEach(user -> user.setOrders(null));
-        return UserResponseDto.toDtoList(users);
+    public boolean existsUserByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     private User checkUser(Long id, UserRequestDto newUser) {
