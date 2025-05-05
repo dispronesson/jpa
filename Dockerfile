@@ -1,9 +1,9 @@
 FROM eclipse-temurin:23-jdk
 
-WORKDIR /app
+WORKDIR /docker
 
-COPY target/myapp-0.0.1.jar .
+COPY target/app-0.0.1.jar .
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "myapp-0.0.1.jar"]
+ENTRYPOINT ["java", "-jar", "app-0.0.1.jar"]

@@ -1,6 +1,6 @@
 services:
   app:
-    image: myapp
+    image: app
     build: .
     ports:
       - "8080:8080"
