@@ -1,9 +1,10 @@
+FROM eclipse-temurin:23-jdk AS build
+WORKDIR /app
+COPY . .
+RUN ./mvnw clean package -DskipTests
+
 FROM eclipse-temurin:23-jdk
-
-WORKDIR /docker
-
-COPY target/app-0.0.1.jar .
-
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app-0.0.1.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
