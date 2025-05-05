@@ -9,8 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>demo</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>myapp</artifactId>
+    <version>0.0.1</version>
     <name>jpa</name>
     <description>jpa</description>
     <url/>

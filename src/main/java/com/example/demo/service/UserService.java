@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.component.CustomCache;
+import com.example.demo.dto.OrderResponseDto;
 import com.example.demo.dto.UserRequestDto;
 import com.example.demo.dto.UserResponseDto;
 import com.example.demo.exception.ConflictException;
@@ -9,6 +10,7 @@ import com.example.demo.exception.NotFoundException;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -119,7 +121,14 @@ public class UserService {
     }
 
     public List<UserResponseDto> getUsers() {
-        return UserResponseDto.toDtoList(userRepository.findAll());
+        return UserResponseDto.toDtoList(userRepository.findAll())
+                .stream().map(user -> {
+                    List<OrderResponseDto> orders = user.getOrders().stream()
+                            .sorted(Comparator.comparing(OrderResponseDto::getId))
+                            .toList();
+                    user.setOrders(orders);
+                    return user;
+                }).toList();
     }
 
     public UserResponseDto getUserById(Long id) {
