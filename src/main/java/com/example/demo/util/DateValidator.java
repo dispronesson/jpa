@@ -8,6 +8,7 @@ public class DateValidator {
         throw new IllegalStateException("Utility class");
     }
 
+    @SuppressWarnings("checkstyle:CatchParameterName")
     public static boolean isValidDate(String date) {
         if (date.length() != 10) {
             return false;
@@ -16,7 +17,7 @@ public class DateValidator {
         try {
             LocalDate.parse(date);
             return true;
-        } catch (DateTimeParseException ex) {
+        } catch (DateTimeParseException _) {
             return false;
         }
     }
