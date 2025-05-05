@@ -74,10 +74,4 @@ public class UserController {
     public UserResponseDto getUserById(@PathVariable long id) {
         return userService.getUserById(id);
     }
-
-    @GetMapping("/email/{email}")
-    @Operation(summary = "Check a specific user by email")
-    public boolean existsUserByEmail(@PathVariable String email) {
-        return userService.existsUserByEmail(email);
-    }
 }

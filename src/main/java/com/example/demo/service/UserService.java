@@ -141,10 +141,6 @@ public class UserService {
         return userDto;
     }
 
-    public boolean existsUserByEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
     private User checkUser(Long id, UserRequestDto newUser) {
         if (id <= 0) {
             throw new InvalidArgumentsException(INVALID_ID_MESSAGE);

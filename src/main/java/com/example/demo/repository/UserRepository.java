@@ -16,8 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u ORDER BY u.id ASC")
     List<User> findAll();
 
-    Optional<User> findByEmail(String email);
-
     boolean existsByEmail(String email);
 
     @EntityGraph(attributePaths = "orders")

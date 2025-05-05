@@ -1,60 +1,57 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, Button, notification } from 'antd';
+import {Modal, Form, Input, Button, message} from 'antd';
 import axios from 'axios';
 
-const CreateUserModal = ({ onCancel, onCreateUser }) => {
+const EditUserModal = ({ onCancel, onSaveUser, user }) => {
     const [form] = Form.useForm();
-    const [emailError, setEmailError] = useState('');
-    const [isCreating, setIsCreating] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
 
-            const email = values.email;
+            const payload = {};
+            if (values.name !== user.name) payload.name = values.name;
+            if (values.email !== user.email) payload.email = values.email;
 
-            const response = await axios.get(`/api/users/email/${email}`);
-
-            if (response.data === true) {
-                setEmailError('User with this email already exists.');
+            if (Object.keys(payload).length === 0) {
+                message.info("No changes to save");
                 return;
             }
 
-            setIsCreating(true);
-
-            await axios.post('/api/users', values);
-
-            notification.success({
-                message: 'User created successfully',
-            });
-
-            onCreateUser();
+            setIsUpdating(true);
+            await axios.patch(`/api/users/${user.id}`, payload);
+            message.success("User updated successfully");
+            onSaveUser();
 
         } catch (error) {
-            if (error.response?.status === 400) {
-                notification.error({
-                    message: 'Failed to create user',
-                    description: 'There was an issue creating the user.',
-                });
+            if (error.response?.status === 409) {
+                message.error('The specified email is already taken')
+            } else {
+                message.error("Failed to create user");
             }
         } finally {
-            setIsCreating(false);
+            setIsUpdating(false);
         }
-    };
-
-    const handleEmailChange = () => {
-        setEmailError('');
     };
 
     return (
         <Modal
             open={true}
-            title="Create User"
+            title="Edit User"
             onCancel={onCancel}
             footer={null}
             width={400}
         >
-            <Form form={form} layout="vertical" onFinish={handleSubmit}>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                initialValues={{
+                    name: user.name,
+                    email: user.email,
+                }}
+            >
                 <Form.Item
                     label="Name"
                     name="name"
@@ -82,24 +79,18 @@ const CreateUserModal = ({ onCancel, onCreateUser }) => {
                         { type: 'email', message: 'Invalid email format' }
                     ]}
                 >
-                    <Input onChange={handleEmailChange} />
+                    <Input />
                 </Form.Item>
-
-                {emailError && (
-                    <div style={{ color: 'red', marginTop: '-22px'}}>
-                        {emailError}
-                    </div>
-                )}
 
                 <Form.Item>
                     <Button
                         type="primary"
                         htmlType="submit"
                         block
-                        loading={isCreating}
-                        disabled={isCreating}
+                        loading={isUpdating}
+                        disabled={isUpdating}
                     >
-                        Create
+                        Save
                     </Button>
                 </Form.Item>
             </Form>
@@ -107,4 +98,4 @@ const CreateUserModal = ({ onCancel, onCreateUser }) => {
     );
 };
 
-export default CreateUserModal;
+export default EditUserModal;
