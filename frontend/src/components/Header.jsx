@@ -12,7 +12,7 @@ function Header() {
     return (
         <AntHeader style={{ background: '#fff', padding: '6px 22px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
             <Title level={1} style={{ margin: 0, cursor: 'pointer' }} onClick={handleClick}>
-                OrdersService
+                Orders Service
             </Title>
         </AntHeader>
     );

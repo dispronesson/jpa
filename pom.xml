@@ -9,10 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>app</artifactId>
-    <version>0.0.1</version>
-    <name>jpa</name>
-    <description>jpa</description>
+    <artifactId>orders-service</artifactId>
+    <version>1.0.0</version>
+    <name>orders-service</name>
     <url/>
     <licenses>
         <license/>
@@ -96,6 +95,8 @@
     </dependencies>
 
     <build>
+        <finalName>orders-service</finalName>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -147,7 +148,6 @@
                     </execution>
                 </executions>
             </plugin>
-
 
         </plugins>
     </build>

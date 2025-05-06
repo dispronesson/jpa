@@ -1,5 +1,6 @@
-# JPA
-Java Persistence API (JPA) — спецификация API Jakarta EE, которая предоставляет возможность сохранять в удобном виде Java-объекты в базе данных. В данном проекте реализована связь сущностей OneToMany, которые хранятся в БД. Для реализации JPA использован Hibernate. Запрашиваемые данные помещаются в in-memory LRU кэш для оптимизации работы БД. Присутствуют пагинация и гет-запросы с параметрами для фильтрации данных из БД, а также получение лог-файла за определенную дату из общего лог-файла. Все ошибки обрабатываются через глобальный обработчик исключений (ControllerAdvice).
+# Orders Service
+Простое Spring Boot приложение, позволяющее создавать пользователей и заказы. Приложение использует PostgreSQL в качестве БД. Фронтенд реализован с помощью библиотек React & Ant Design, которые позволяют сделать
+удобный, привлекательный и отзывчивый интерфейс.
 
 ## Технологии
 
@@ -8,31 +9,48 @@ Java Persistence API (JPA) — спецификация API Jakarta EE, кото
 - Maven
 - Hibernate
 - PostgreSQL
-- Lombok
-- SpringDoc
-
-## Требования
-
-- Java 23+
-- Spring Boot 3.4.3+
-- Maven 3.9.9+
-- Hibernate 6.6.8+
-- PostgreSQL 42.7.5+
-- Lombok 1.18.36+
-- SpringDoc 2.8+
+- React & Ant Design
+- Docker
+- SwaggerUI
+- Mockito & JUnit
 
 ## Установка и запуск
 
-```bash
-git clone https://github.com/dispronesson/jpa.git
-cd jpa
-mvn clean install
-mvn spring-boot:run
-```
-В resources/application.properties на место ${DB_URL}, ${DB_USER}, ${DB_PASS} необходимо указать соответственно url, где находится ваша БД, юзернейм и пароль пользователя БД.
+Для запуска приложения можно использовать как свою локальную машину, так и Docker контейнеры.
 
-Документация по всем HTTP-методам в проекте по умолчанию доступна по адресу: http://localhost:8080/swagger-ui/index.html
+Для запуска на своей машине запустите приведенные ниже команды.
+
+```bash
+$ git clone https://github.com/dispronesson/orders-service.git
+$ cd orders-service
+$ mvn spring-boot:run
+```
+
+Для запуска в Docker запустите приведенные ниже команды.
+
+```bash
+$ git clone https://github.com/dispronesson/orders-service.git
+$ cd orders-service
+$ docker-compose up --build
+```
+
+Следующие сервисы буду запущены:
+
+| URL                                  | Сервис                |
+|--------------------------------------|-----------------------|
+| localhost:8080                       | OrdersService Web App |
+| localhost:8080/swagger-ui/index.html | OrdersService Web Api |
+| localhost:5432                       | PostgreSQL            |
+
+## Тестирование
+
+Внутри проекта присутствует 2 юнит-теста:
+
+- OrderServiceTest
+- UserServiceTest
+
+Для их запуска в корне каталога необходимо прописать ```$ mvn clean test```.
 
 ## SonarCloud
 
-[SonarCloud](https://sonarcloud.io/project/overview?id=dispronesson_jpa)
+[SonarCloud](https://sonarcloud.io/project/overview?id=dispronesson_orders-service)

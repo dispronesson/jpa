@@ -5,6 +5,6 @@ RUN chmod +x ./mvnw && ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:23-jdk
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/orders-service.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
