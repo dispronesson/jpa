@@ -18,7 +18,7 @@
 
 Для запуска приложения можно использовать как свою локальную машину, так и Docker контейнеры.
 
-Для запуска на своей машине запустите приведенные ниже команды.
+Для запуска на своей машине пропишите приведенные ниже команды.
 
 ```bash
 $ git clone https://github.com/dispronesson/orders-service.git
@@ -26,7 +26,7 @@ $ cd orders-service
 $ mvn spring-boot:run
 ```
 
-Для запуска в Docker запустите приведенные ниже команды.
+Для запуска в Docker пропишите приведенные ниже команды.
 
 ```bash
 $ git clone https://github.com/dispronesson/orders-service.git
@@ -40,16 +40,11 @@ $ docker-compose up --build
 |--------------------------------------|-----------------------|
 | localhost:8080                       | OrdersService Web App |
 | localhost:8080/swagger-ui/index.html | OrdersService Web Api |
-| localhost:5432                       | PostgreSQL            |
 
 ## Тестирование
 
-Внутри проекта присутствует 2 юнит-теста:
-
-- OrderServiceTest
-- UserServiceTest
-
-Для их запуска в корне каталога необходимо прописать ```$ mvn clean test```.
+В проекте используется юнит-тестирование. В директории src/tests находятся юнит-тесы для бизнес-логики проекта.
+Для их запуска в корне проекта необходимо прописать ```$ mvn clean test```.
 
 ## SonarCloud
 
