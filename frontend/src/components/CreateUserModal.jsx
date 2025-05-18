@@ -11,8 +11,9 @@ const CreateUserModal = ({ onCancel, onCreateUser }) => {
             const values = await form.validateFields();
             setIsCreating(true);
             await axios.post('/api/users', values);
+            await onCreateUser();
             message.success("User created successfully");
-            onCreateUser();
+            onCancel();
         } catch (error) {
             if (error.response?.status === 409) {
                 message.error('The specified email is already taken')

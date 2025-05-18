@@ -75,43 +75,6 @@ class OrderServiceTest {
     }
 
     @Test
-    void updateEntireOrder_whenIdIsInvalid_throwsException() {
-        OrderRequestDto orderRequestDto = new OrderRequestDto();
-
-        assertThrows(InvalidArgumentsException.class,
-                () -> orderService.updateEntireOrder(-1L, orderRequestDto));
-    }
-
-    @Test
-    void updateEntireOrder_whenOrderDoesNotExist_throwsException() {
-        when(orderRepository.findById(1L)).thenReturn(Optional.empty());
-
-        OrderRequestDto orderRequestDto = new OrderRequestDto();
-
-        assertThrows(NotFoundException.class,
-                () -> orderService.updateEntireOrder(1L, orderRequestDto));
-    }
-
-    @Test
-    void updateEntireOrder_whenOrderExists_returnsOrder() {
-        OrderRequestDto orderRequestDto = new OrderRequestDto("TV", 500.0);
-        User user = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
-
-        Order existingOrder = new Order(1L, "Fridge", 300.0, user);
-
-        when(orderRepository.findById(1L)).thenReturn(Optional.of(existingOrder));
-        when(orderRepository.save(any(Order.class))).thenReturn(null);
-        when(cache.removeOrder(1L)).thenReturn(null);
-        when(cache.removeUser(anyLong())).thenReturn(null);
-
-        OrderResponseDto result = orderService.updateEntireOrder(1L, orderRequestDto);
-
-        assertNotNull(result);
-        assertEquals(existingOrder.getId(), result.getId());
-        assertEquals(existingOrder.getDescription(), result.getDescription());
-    }
-
-    @Test
     void updatePartiallyOrder_whenIdIsInvalid_throwsException() {
         OrderRequestDto orderRequestDto = new OrderRequestDto();
 
@@ -269,55 +232,5 @@ class OrderServiceTest {
         assertNotNull(result);
         assertEquals(order.getId(), result.getId());
         assertEquals(order.getDescription(), result.getDescription());
-    }
-
-    @Test
-    void getOrdersByUserName_whenUserNameIsBlank_throwsException() {
-        assertThrows(InvalidArgumentsException.class,
-                () -> orderService.getOrdersByUserName("  ", 0, 5));
-    }
-
-    @Test
-    void getOrdersByUserName_whenUserNameIsValid_returnsOrders() {
-        Pageable pageable = PageRequest.of(1, 5);
-        User user = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
-        List<Order> orders = List.of(new Order(1L, "TV", 300.0, user));
-        Page<Order> ordersPage = new PageImpl<>(orders, pageable, orders.size());
-
-        when(orderRepository.findByUserName(eq(user.getName()),
-                any(Pageable.class))).thenReturn(ordersPage);
-
-        Page<OrderResponseDto> result = orderService
-                .getOrdersByUserName(user.getName(), 1, 5);
-
-        assertNotNull(result);
-        assertEquals(ordersPage.getTotalElements(), result.getTotalElements());
-        assertEquals(ordersPage.getContent().getFirst().getId(),
-                result.getContent().getFirst().getId());
-    }
-
-    @Test
-    void getOrdersByUserEmail_whenUserEmailIsBlank_throwsException() {
-        assertThrows(InvalidArgumentsException.class,
-                () -> orderService.getOrdersByUserEmail("  ", 0, 5));
-    }
-
-    @Test
-    void getOrdersByUserEmail_whenUserEmailIsValid_returnsOrders() {
-        Pageable pageable = PageRequest.of(1, 5);
-        User user = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
-        List<Order> orders = List.of(new Order(1L, "TV", 300.0, user));
-        Page<Order> ordersPage = new PageImpl<>(orders, pageable, orders.size());
-
-        when(orderRepository.findByUserEmail(eq(user.getEmail()),
-                any(Pageable.class))).thenReturn(ordersPage);
-
-        Page<OrderResponseDto> result = orderService
-                .getOrdersByUserEmail(user.getEmail(), 1, 5);
-
-        assertNotNull(result);
-        assertEquals(ordersPage.getTotalElements(), result.getTotalElements());
-        assertEquals(ordersPage.getContent().getFirst().getId(),
-                result.getContent().getFirst().getId());
     }
 }

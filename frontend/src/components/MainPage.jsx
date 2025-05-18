@@ -6,6 +6,7 @@ import {DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import EditUserModal from "./EditUserModal";
 import AddOrderModal from "./AddOrderModal";
 import EditOrderModal from "./EditOrderModal";
+import ThinSpinner from "./ThinSpinner";
 
 const { Text } = Typography;
 const { Panel } = Collapse;
@@ -15,6 +16,9 @@ function MainPage() {
     const [activeModal, setActiveModal] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
     const [currentOrder, setCurrentOrder] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [deletingUserId, setDeletingUserId] = useState(null);
+    const [deletingOrderId, setDeletingOrderId] = useState(null);
 
     const fetchUsers = async () => {
         try {
@@ -46,8 +50,12 @@ function MainPage() {
     };
 
     useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 400);
         fetchUsers();
     }, []);
+
 
     const openModal = (type) => setActiveModal(type);
 
@@ -62,7 +70,10 @@ function MainPage() {
                     Create User
                 </Button>
             </div>
-            {users.length === 0 ? (
+
+            {loading ? (
+                <ThinSpinner size={40} color="#1677ff" />
+            ) : users.length === 0 ? (
                 <Empty description="No data"/>
             ) : (
                 <Collapse accordion >
@@ -70,14 +81,23 @@ function MainPage() {
                         <Panel
                             key={user.id}
                             header={
-                                <Col>
+                                <div>
                                     <Row>
-                                        <Text strong>User: {user.name}</Text>
+                                        <Space size={10}>
+                                            <Text>
+                                                <strong>User: {user.name}</strong>
+                                            </Text>
+                                            <Text type="secondary">
+                                                {user.orders.length} orders
+                                            </Text>
+                                        </Space>
                                     </Row>
                                     <Row>
-                                        <Text type="secondary">Email: {user.email}</Text>
+                                        <Text type="secondary">
+                                            Email: {user.email}
+                                        </Text>
                                     </Row>
-                                </Col>
+                                </div>
                             }
                             extra={
                                 <Space>
@@ -107,10 +127,13 @@ function MainPage() {
                                         <Button
                                             type="text"
                                             danger
+                                            loading={deletingUserId === user.id}
                                             icon={<DeleteOutlined />}
-                                            onClick={(e) => {
+                                            onClick={async (e) => {
                                                 e.stopPropagation();
-                                                handleDeleteUser(user.id);
+                                                setDeletingUserId(user.id);
+                                                await handleDeleteUser(user.id);
+                                                setDeletingUserId(null);
                                             }}
                                         />
                                     </Tooltip>
@@ -123,10 +146,14 @@ function MainPage() {
                                     <List.Item key={order.id}>
                                         <Col>
                                             <Row>
-                                                <Text><strong>{index + 1}. Description:</strong> {order.description}</Text>
+                                                <Text>
+                                                    <strong>Description:</strong> {order.description}
+                                                </Text>
                                             </Row>
                                             <Row>
-                                                <Text style={{ padding: '0 13px' }}><strong>Price:</strong> <Text>{order.price} $</Text></Text>
+                                                <Text>
+                                                    <strong>Price:</strong> {order.price} $
+                                                </Text>
                                             </Row>
                                         </Col>
                                         <Col>
@@ -146,10 +173,13 @@ function MainPage() {
                                                     <Button
                                                         type="text"
                                                         danger
+                                                        loading={deletingOrderId === order.id}
                                                         icon={<DeleteOutlined />}
-                                                        onClick={(e) => {
+                                                        onClick={async (e) => {
                                                             e.stopPropagation();
-                                                            handleDeleteOrder(order.id);
+                                                            setDeletingOrderId(order.id);
+                                                            await handleDeleteOrder(order.id);
+                                                            setDeletingOrderId(null);
                                                         }}
                                                     />
                                                 </Tooltip>
@@ -166,9 +196,8 @@ function MainPage() {
             {activeModal === 'createUser' && (
                 <CreateUserModal
                     onCancel={closeModal}
-                    onCreateUser={() => {
-                        fetchUsers();
-                        closeModal();
+                    onCreateUser={async () => {
+                        await fetchUsers();
                     }}
                 />
             )}
@@ -176,8 +205,8 @@ function MainPage() {
             {activeModal === 'editUser' && (
                 <EditUserModal
                     onCancel={closeModal}
-                    onSaveUser={() => {
-                        fetchUsers();
+                    onSaveUser={async () => {
+                        await fetchUsers();
                         closeModal();
                     }}
                     user={currentUser}
@@ -187,8 +216,8 @@ function MainPage() {
             {activeModal === 'addOrder' && (
                 <AddOrderModal
                     onCancel={closeModal}
-                    onCreate={() => {
-                        fetchUsers();
+                    onCreate={async () => {
+                        await fetchUsers();
                         closeModal();
                     }}
                     id={currentUser.id}
@@ -198,8 +227,8 @@ function MainPage() {
             {activeModal === 'editOrder' && (
                 <EditOrderModal
                     onCancel={closeModal}
-                    onSaveOrder={() => {
-                        fetchUsers();
+                    onSaveOrder={async () => {
+                        await fetchUsers();
                         closeModal();
                     }}
                     order={currentOrder}

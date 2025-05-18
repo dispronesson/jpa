@@ -59,20 +59,6 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto updateEntireUser(Long id, UserRequestDto newUser) {
-        User existingUser = checkUser(id, newUser);
-
-        existingUser.setEmail(newUser.getEmail());
-        existingUser.setName(newUser.getName());
-
-        userRepository.save(existingUser);
-
-        cache.removeUser(id);
-
-        return UserResponseDto.toDto(existingUser);
-    }
-
-    @Transactional
     public UserResponseDto updatePartiallyUser(Long id, UserRequestDto newUser) {
         User existingUser = checkUser(id, newUser);
 
@@ -122,12 +108,11 @@ public class UserService {
 
     public List<UserResponseDto> getUsers() {
         return UserResponseDto.toDtoList(userRepository.findAll())
-                .stream().map(user -> {
+                .stream().peek(user -> {
                     List<OrderResponseDto> orders = user.getOrders().stream()
                             .sorted(Comparator.comparing(OrderResponseDto::getId))
                             .toList();
                     user.setOrders(orders);
-                    return user;
                 }).toList();
     }
 

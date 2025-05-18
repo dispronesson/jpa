@@ -1,9 +1,8 @@
 package com.example.demo.aspect;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
@@ -17,10 +16,9 @@ public class CountAspect {
             + "&& !within(com.example.demo.controller.CountController)")
     public void getMappingMethods() {}
 
-    @Around("getMappingMethods()")
-    public Object countRequests(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Before("getMappingMethods()")
+    public void countRequests() {
         counter.incrementAndGet();
-        return joinPoint.proceed();
     }
 
     public int getCounter() {

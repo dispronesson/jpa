@@ -132,54 +132,6 @@ class UserServiceTest {
     }
 
     @Test
-    void updateEntireUser_whenUserExists_returnsUpdateUser() {
-        UserRequestDto newUser = new UserRequestDto("Alex", "AlexAlex@mail.ru");
-
-        User existingUser = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
-
-        when(userRepository.existsByEmail(newUser.getEmail())).thenReturn(false);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        when(userRepository.save(any(User.class))).thenReturn(existingUser);
-        when(cache.removeUser(1L)).thenReturn(null);
-
-        UserResponseDto result = userService.updateEntireUser(1L, newUser);
-
-        assertEquals(existingUser.getId(), result.getId());
-        assertEquals(existingUser.getEmail(), result.getEmail());
-        verify(userRepository).existsByEmail(newUser.getEmail());
-        verify(userRepository).findById(1L);
-        verify(userRepository).save(any(User.class));
-        verify(cache).removeUser(1L);
-    }
-
-    @Test
-    void updateEntireUser_whenUserDoesNotExist_throwException() {
-        UserRequestDto newUser = new UserRequestDto("Alex", "AlexAlex@mail.ru");
-
-        when(userRepository.existsByEmail(newUser.getEmail())).thenReturn(false);
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> userService.updateEntireUser(1L, newUser));
-    }
-
-    @Test
-    void updateEntireUser_whenEmailIsAlreadyExists_throwException() {
-        UserRequestDto newUser = new UserRequestDto("Alex", "AlexAlex@mail.ru");
-
-        when(userRepository.existsByEmail(newUser.getEmail())).thenReturn(true);
-
-        assertThrows(ConflictException.class, () -> userService.updateEntireUser(1L, newUser));
-    }
-
-    @Test
-    void updateEntireUser_whenIdIsInvalid_throwException() {
-        UserRequestDto userRequestDto = new UserRequestDto();
-
-        assertThrows(InvalidArgumentsException.class,
-                () -> userService.updateEntireUser(-1L, userRequestDto));
-    }
-
-    @Test
     void deleteUser_whenUserExists_return() {
         User user = new User(1L, "John", "JohnDoe@mail.ru", new ArrayList<>());
 

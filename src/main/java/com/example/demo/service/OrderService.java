@@ -48,20 +48,6 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponseDto updateEntireOrder(Long id, OrderRequestDto newOrder) {
-        Order existingOrder = checkOrder(id);
-
-        existingOrder.setDescription(newOrder.getDescription());
-        existingOrder.setPrice(newOrder.getPrice());
-        orderRepository.save(existingOrder);
-
-        cache.removeOrder(id);
-        cache.removeUser(existingOrder.getUser().getId());
-
-        return OrderResponseDto.toDto(existingOrder);
-    }
-
-    @Transactional
     public OrderResponseDto updatePartiallyOrder(Long id, OrderRequestDto newOrder) {
         Order existingOrder = checkOrder(id);
 
@@ -136,34 +122,6 @@ public class OrderService {
         cache.putOrder(id, orderDto);
 
         return orderDto;
-    }
-
-    public Page<OrderResponseDto> getOrdersByUserName(String userName, int page, int size) {
-        if (userName.isBlank()) {
-            throw new InvalidArgumentsException("User name cannot be blank");
-        }
-
-        checkPageAndSize(page, size);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<Order> ordersPage = orderRepository.findByUserName(userName, pageable);
-        List<OrderResponseDto> ordersDto = OrderResponseDto.toDtoList(ordersPage.getContent());
-
-        return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
-    }
-
-    public Page<OrderResponseDto> getOrdersByUserEmail(String userEmail, int page, int size) {
-        if (userEmail.isBlank()) {
-            throw new InvalidArgumentsException("User email cannot be blank");
-        }
-
-        checkPageAndSize(page, size);
-
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<Order> ordersPage = orderRepository.findByUserEmail(userEmail, pageable);
-        List<OrderResponseDto> ordersDto = OrderResponseDto.toDtoList(ordersPage.getContent());
-
-        return new PageImpl<>(ordersDto, pageable, ordersPage.getTotalElements());
     }
 
     public Page<OrderResponseDto> getOrdersByUserId(Long userId, int page, int size) {

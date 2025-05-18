@@ -9,12 +9,11 @@ const AddOrderModal = ({ onCancel, onCreate, id }) => {
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
-
             setIsCreating(true);
             await axios.post(`/api/users/${id}/order`, values);
+            await onCreate();
             message.success("Order created successfully");
-            onCreate();
-
+            onCancel();
         } catch (error) {
             message.error("Failed to create order");
         } finally {

@@ -32,7 +32,7 @@ public class LoggingAspect {
 
     @Before("allDemoMethods()")
     public void allDemoMethodsBefore(JoinPoint joinPoint) {
-        logger.info("[METHOD] {}.{} was called",
+        logger.debug("[METHOD] {}.{} was called",
                 joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName()
         );
@@ -40,7 +40,7 @@ public class LoggingAspect {
 
     @After("allDemoMethods()")
     public void allDemoMethodsAfter(JoinPoint joinPoint) {
-        logger.info("[METHOD] {}.{} was executed",
+        logger.debug("[METHOD] {}.{} was executed",
                 joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName()
         );
@@ -48,7 +48,7 @@ public class LoggingAspect {
 
     @AfterReturning(value = "allDemoMethods()", returning = "result")
     public void allDemoMethodsAfterReturn(JoinPoint joinPoint, Object result) {
-        logger.info("[METHOD] {}.{} returned a value: {}",
+        logger.debug("[METHOD] {}.{} returned a value: {}",
                 joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), result);
     }
@@ -66,7 +66,7 @@ public class LoggingAspect {
         String cacheName = methodName.toLowerCase().contains("user") ? USER_CACHE : ORDER_CACHE;
         Object key = joinPoint.getArgs()[0];
         Object value = joinPoint.getArgs()[1];
-        logger.info("[CACHE] {} with key '{}' was saved in {}", value, key, cacheName);
+        logger.debug("[CACHE] {} with key '{}' was saved in {}", value, key, cacheName);
     }
 
     @AfterReturning(
@@ -78,9 +78,9 @@ public class LoggingAspect {
         String cacheName = methodName.toLowerCase().contains("user") ? USER_CACHE : ORDER_CACHE;
         Object key = joinPoint.getArgs()[0];
         if (result != null) {
-            logger.info("[CACHE] {} with key '{}' was removed from {}", result, key, cacheName);
+            logger.debug("[CACHE] {} with key '{}' was removed from {}", result, key, cacheName);
         } else {
-            logger.info("[CACHE] No item with key '{}' was removed from {}", key, cacheName);
+            logger.debug("[CACHE] No item with key '{}' was removed from {}", key, cacheName);
         }
     }
 
@@ -94,9 +94,9 @@ public class LoggingAspect {
         String cacheName = methodName.toLowerCase().contains("user") ? USER_CACHE : ORDER_CACHE;
         Object key = joinPoint.getArgs()[0];
         if (result != null) {
-            logger.info("[CACHE] {} with key '{}' was received from {}", result, key, cacheName);
+            logger.debug("[CACHE] {} with key '{}' was received from {}", result, key, cacheName);
         } else {
-            logger.info("[CACHE] No item with key '{}' found in {}", key, cacheName);
+            logger.debug("[CACHE] No item with key '{}' found in {}", key, cacheName);
         }
     }
 }

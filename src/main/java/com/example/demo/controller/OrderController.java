@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,15 +36,6 @@ public class OrderController {
         OrderResponseDto createdOrder = orderService.createOrder(userId, order);
         return ResponseEntity.created(URI.create("/orders/" + createdOrder.getId()))
                 .body(createdOrder);
-    }
-
-    @PutMapping("/orders/{id}")
-    @Operation(summary = "Changing an existing order entirely")
-    public ResponseEntity<OrderResponseDto> updateOrder(
-            @PathVariable long id,
-            @Valid @RequestBody OrderRequestDto order
-    ) {
-        return ResponseEntity.ok(orderService.updateEntireOrder(id, order));
     }
 
     @PatchMapping("/orders/{id}")
@@ -77,26 +67,6 @@ public class OrderController {
     @Operation(summary = "Getting a specific order")
     public OrderResponseDto getOrder(@PathVariable long id) {
         return orderService.getOrderById(id);
-    }
-
-    @GetMapping(value = "/orders/by-user-name")
-    @Operation(summary = "Getting a list of paginated orders with specific user's name")
-    public List<OrderResponseDto> getOrdersByUserName(
-            @RequestParam String userName,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return orderService.getOrdersByUserName(userName, page, size).getContent();
-    }
-
-    @GetMapping(value = "/orders/by-user-email")
-    @Operation(summary = "Getting a list of paginated orders with specific user's email")
-    public List<OrderResponseDto> getOrdersByUserEmail(
-            @RequestParam String userEmail,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        return orderService.getOrdersByUserEmail(userEmail, page, size).getContent();
     }
 
     @GetMapping(value = "/users/{userId}/orders")

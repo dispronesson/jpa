@@ -21,9 +21,9 @@ const EditOrderModal = ({ onCancel, onSaveOrder, order }) => {
 
             setIsUpdating(true);
             await axios.patch(`/api/orders/${order.id}`, payload);
+            await onSaveOrder();
             message.success("Order updated successfully");
-            onSaveOrder();
-
+            onCancel();
         } catch (error) {
             message.error("Failed to update order");
         } finally {

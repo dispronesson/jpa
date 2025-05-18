@@ -21,9 +21,9 @@ const EditUserModal = ({ onCancel, onSaveUser, user }) => {
 
             setIsUpdating(true);
             await axios.patch(`/api/users/${user.id}`, payload);
+            await onSaveUser();
             message.success("User updated successfully");
-            onSaveUser();
-
+            onCancel();
         } catch (error) {
             if (error.response?.status === 409) {
                 message.error('The specified email is already taken')
