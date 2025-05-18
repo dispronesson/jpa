@@ -108,11 +108,12 @@ public class UserService {
 
     public List<UserResponseDto> getUsers() {
         return UserResponseDto.toDtoList(userRepository.findAll())
-                .stream().peek(user -> {
+                .stream().map(user -> {
                     List<OrderResponseDto> orders = user.getOrders().stream()
                             .sorted(Comparator.comparing(OrderResponseDto::getId))
                             .toList();
                     user.setOrders(orders);
+                    return user;
                 }).toList();
     }
 
